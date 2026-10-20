@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="images/icon-512.png">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Notes - NIIT Smart Student Companion</title>
+
+
+<style>
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f4f6f9;
+    }
+
+    .header {
+        background: #1e3a8a;
+        color: white;
+        padding: 20px 30px;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header h1 {
+        margin: 0;
+    }
+
+    .back-btn {
+        background: white;
+        color: #1e3a8a;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 15px;
+    }
+
+    .back-btn:hover {
+        background: #e5e7eb;
+    }
+
+    .container {
+        padding: 30px;
+    }
+
+    .container h2 {
+        color: #1e3a8a;
+        margin-bottom: 25px;
+    }
+
+    #notesContainer {
+
+        display: grid;
+
+        grid-template-columns:
+            repeat(auto-fit, minmax(280px, 1fr));
+
+        gap: 20px;
+    }
+
+    .note-card {
+
+        background: white;
+
+        padding: 25px;
+
+        border-radius: 10px;
+
+        box-shadow:
+            0 2px 8px rgba(0, 0, 0, 0.1);
+
+        transition: 0.3s;
+    }
+
+    .note-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .note-card h3 {
+        color: #1e3a8a;
+        margin-top: 0;
+        margin-bottom: 15px;
+    }
+
+    .note-card p {
+        color: #555;
+        line-height: 1.5;
+    }
+
+    .note-info {
+        margin-top: 10px;
+        font-size: 14px;
+    }
+
+    .download-btn {
+
+        display: inline-block;
+
+        margin-top: 15px;
+
+        background: #1e3a8a;
+
+        color: white;
+
+        text-decoration: none;
+
+        padding: 10px 18px;
+
+        border-radius: 5px;
+    }
+
+    .download-btn:hover {
+        background: #172554;
+    }
+
+    .loading {
+        font-size: 18px;
+        color: #555;
+    }
+
+    .error {
+        color: red;
+        font-size: 18px;
+    }
+
+    .no-notes {
+        color: #555;
+        font-size: 18px;
+    }
+
+</style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    </head>
+<body>
+
+<div class="header">
+
+    <h1><i class="fa-solid fa-book-open" aria-hidden="true"></i> Study Notes</h1>
+
+    <button
+        class="back-btn"
+        onclick="goBack()">
+
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Dashboard
+
+    </button>
+
+</div>
+
+
+<div class="container">
+
+    <h2>Available Notes</h2>
+
+    <div id="notesContainer">
+
+        <p class="loading">
+            Loading notes...
+        </p>
+
+    </div>
+
+</div>
+
+
+<script src="js/notes.js"></script>
+
+</body>
+
+</html>

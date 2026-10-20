@@ -1,0 +1,20 @@
+package com.niit.studentcompanion.repository;
+
+import com.niit.studentcompanion.entity.Student;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface StudentRepository extends JpaRepository<Student, Long> {
+
+    Optional<Student> findByEmail(String email);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByMobile(String mobile);
+
+    boolean existsByEmailAndStudentIdNot(String email, Long studentId);
+
+    boolean existsByMobileAndStudentIdNot(String mobile, Long studentId);
+}

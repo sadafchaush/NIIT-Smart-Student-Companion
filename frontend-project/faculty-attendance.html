@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="images/icon-512.png">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Faculty - Attendance</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+        }
+
+        header {
+            background: #1e3a8a;
+            color: white;
+            padding: 20px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h2 {
+            margin: 0;
+        }
+
+        .back-button {
+            background: white;
+            color: #1e3a8a;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .back-button:hover {
+            background: #e5e7eb;
+        }
+
+        .container {
+            padding: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+        }
+
+        h3 {
+            margin-top: 0;
+            color: #1e3a8a;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .save-button,
+        .update-button,
+        .cancel-button {
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .save-button,
+        .update-button {
+            background: #1e3a8a;
+        }
+
+        .cancel-button {
+            background: #777;
+            display: none;
+        }
+
+        .delete-button {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+
+        .edit-button {
+            background: #f59e0b;
+            color: white;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .edit-button:hover {
+            background: #d97706;
+        }
+
+        .delete-button:hover {
+            background: #b91c1c;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .error {
+            color: red;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #1e3a8a;
+            color: white;
+            padding: 12px;
+        }
+
+        td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background: #f1f5f9;
+        }
+
+        .action-column {
+            min-width: 150px;
+        }
+
+        @media (max-width: 600px) {
+
+            header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .back-button {
+                width: 100%;
+            }
+
+            table {
+                font-size: 14px;
+            }
+
+        }
+
+    </style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+
+<body>
+
+    <header>
+
+        <h2>Faculty - Attendance</h2>
+
+        <button
+            type="button"
+            class="back-button"
+            onclick="goBack()">
+
+            <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Dashboard
+
+        </button>
+
+    </header>
+
+
+    <div class="container">
+
+
+        <!-- MARK / UPDATE ATTENDANCE -->
+
+        <div class="card">
+
+            <h3 id="formTitle">
+                Mark Attendance
+            </h3>
+
+
+            <form id="attendanceForm">
+
+                <div class="form-group">
+
+                    <label for="student">
+                        Select Student
+                    </label>
+
+                    <select id="student" required>
+
+                        <option value="">
+                            Loading students...
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="subject">
+                        Select Subject
+                    </label>
+
+                    <select id="subject" required>
+
+                        <option value="">
+                            Loading subjects...
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="attendanceDate">
+                        Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="attendanceDate"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="status">
+                        Attendance Status
+                    </label>
+
+                    <select id="status" required>
+
+                        <option value="PRESENT">
+                            PRESENT
+                        </option>
+
+                        <option value="ABSENT">
+                            ABSENT
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="button-group">
+
+                    <button
+                        type="submit"
+                        id="submitButton"
+                        class="save-button">
+
+                        Mark Attendance
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="cancelButton"
+                        class="cancel-button"
+                        onclick="cancelEdit()">
+
+                        Cancel
+
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="message"
+                    class="message">
+
+                </div>
+
+            </form>
+
+        </div>
+
+
+        <!-- ALL ATTENDANCE -->
+
+        <div class="card">
+
+            <h3>All Attendance Records</h3>
+
+
+            <div id="loadingMessage">
+                Loading attendance...
+            </div>
+
+
+            <table
+                id="attendanceTable"
+                style="display:none;">
+
+                <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+                        <th>Student</th>
+                        <th>Subject</th>
+                        <th>Date</th>
+                        <th>Status</th>
+
+                        <th class="action-column">
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="attendanceBody">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <script src="js/faculty-attendance.js"></script>
+
+
+    <script>
+
+        function goBack() {
+            window.location.href = "faculty-dashboard.html";
+        }
+
+    </script>
+
+</body>
+
+</html>

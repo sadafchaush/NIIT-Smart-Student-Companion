@@ -1,0 +1,411 @@
+/* =========================================
+   NIIT SMART STUDENT COMPANION
+   SPLASH / HOME PAGE
+   ========================================= */
+
+
+/* ---------- General ---------- */
+
+* {
+    box-sizing: border-box;
+}
+
+
+html {
+    scroll-behavior: smooth;
+}
+
+
+body {
+    margin: 0;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background: #f4f6f9;
+
+    color: #1f2937;
+}
+
+
+/* ---------- Header ---------- */
+
+.top-header {
+    background: #1e3a8a;
+
+    color: white;
+
+    padding: 18px 30px;
+
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+
+.header-content {
+    max-width: 1200px;
+
+    margin: auto;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+}
+
+
+.header-logo {
+    width: 58px;
+
+    height: 58px;
+
+    object-fit: cover;
+
+    border-radius: 50%;
+
+    background: white;
+
+    padding: 3px;
+}
+
+
+.header-content h1 {
+    margin: 0;
+
+    font-size: 28px;
+}
+
+
+.header-content p {
+    margin: 5px 0 0;
+
+    font-size: 14px;
+
+    opacity: 0.9;
+}
+
+
+/* ---------- Main ---------- */
+
+.main-container {
+    width: 90%;
+
+    max-width: 1100px;
+
+    margin: 45px auto;
+}
+
+
+/* ---------- Welcome Card ---------- */
+
+.welcome-card {
+    background: white;
+
+    border-radius: 18px;
+
+    padding: 45px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 45px;
+
+    box-shadow:
+        0 5px 20px rgba(0, 0, 0, 0.10);
+}
+
+
+.logo-container {
+    flex-shrink: 0;
+
+    text-align: center;
+}
+
+
+.main-logo {
+    width: 220px;
+
+    height: 220px;
+
+    object-fit: cover;
+
+    border-radius: 50%;
+
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+
+.welcome-content {
+    flex: 1;
+}
+
+
+.welcome-content h2 {
+    margin-top: 0;
+
+    color: #1e3a8a;
+
+    font-size: 34px;
+
+    line-height: 1.2;
+}
+
+
+.description {
+    font-size: 18px;
+
+    line-height: 1.7;
+
+    color: #4b5563;
+
+    margin-bottom: 28px;
+}
+
+
+/* ---------- Login Button ---------- */
+
+.get-started-button {
+    border: none;
+
+    background: #1e3a8a;
+
+    color: white;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    padding: 14px 28px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.get-started-button:hover {
+    background: #162d6b;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 5px 12px rgba(30, 58, 138, 0.3);
+}
+
+
+.get-started-button:active {
+    transform: translateY(0);
+}
+
+
+.login-message {
+    margin-top: 15px;
+
+    color: #6b7280;
+
+    font-size: 14px;
+}
+
+
+/* ---------- Features ---------- */
+
+.features-section {
+    margin-top: 45px;
+
+    text-align: center;
+}
+
+
+.features-section > h2 {
+    color: #1e3a8a;
+
+    font-size: 28px;
+
+    margin-bottom: 25px;
+}
+
+
+.features-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 22px;
+}
+
+
+.feature-card {
+    background: white;
+
+    padding: 28px 20px;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.08);
+
+    transition:
+        transform 0.2s ease;
+}
+
+
+.feature-card:hover {
+    transform: translateY(-4px);
+}
+
+
+.feature-icon {
+    font-size: 48px;
+    color: #1e3a8a;
+    margin-bottom: 15px;
+}
+
+.feature-card h3 {
+    color: #1e3a8a;
+
+    margin: 10px 0;
+}
+
+
+.feature-card p {
+    color: #6b7280;
+
+    line-height: 1.5;
+
+    margin: 0;
+}
+
+
+/* ---------- Footer ---------- */
+
+.footer {
+    background: #1e3a8a;
+
+    color: white;
+
+    text-align: center;
+
+    padding: 20px;
+
+    margin-top: 50px;
+}
+
+
+.footer p {
+    margin: 5px;
+}
+
+
+/* ---------- Tablet ---------- */
+
+@media (max-width: 800px) {
+
+    .welcome-card {
+        flex-direction: column;
+
+        text-align: center;
+
+        padding: 35px 25px;
+    }
+
+
+    .welcome-content h2 {
+        font-size: 28px;
+    }
+
+
+    .features-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+}
+
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 500px) {
+
+    .top-header {
+        padding: 15px;
+    }
+
+
+    .header-content {
+        justify-content: center;
+
+        text-align: left;
+    }
+
+
+    .header-logo {
+        width: 48px;
+
+        height: 48px;
+    }
+
+
+    .header-content h1 {
+        font-size: 20px;
+    }
+
+
+    .header-content p {
+        font-size: 12px;
+    }
+
+
+    .main-container {
+        width: 94%;
+
+        margin: 25px auto;
+    }
+
+
+    .welcome-card {
+        padding: 25px 18px;
+
+        gap: 25px;
+    }
+
+
+    .main-logo {
+        width: 150px;
+
+        height: 150px;
+    }
+
+
+    .welcome-content h2 {
+        font-size: 24px;
+    }
+
+
+    .description {
+        font-size: 16px;
+    }
+
+
+    .get-started-button {
+        width: 100%;
+
+        padding: 14px;
+    }
+
+
+    .features-section > h2 {
+        font-size: 24px;
+    }
+
+}

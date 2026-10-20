@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="images/icon-512.png">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Student Registration</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+
+            font-family: Arial, sans-serif;
+
+            background: linear-gradient(
+                135deg,
+                #e8f0ff,
+                #f5f7ff
+            );
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .registration-container {
+            width: 420px;
+
+            background: white;
+
+            padding: 35px;
+
+            border-radius: 15px;
+
+            box-shadow:
+                0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .title {
+            text-align: center;
+
+            color: #2563eb;
+
+            font-size: 25px;
+
+            font-weight: bold;
+
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+
+            color: #777;
+
+            font-size: 14px;
+
+            margin-bottom: 25px;
+        }
+
+        h2 {
+            text-align: center;
+
+            color: #222;
+
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+
+            margin-bottom: 6px;
+
+            font-weight: bold;
+
+            color: #333;
+
+            font-size: 14px;
+        }
+
+        input,
+        select {
+
+            width: 100%;
+
+            padding: 11px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 7px;
+
+            font-size: 14px;
+
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+
+            border-color: #2563eb;
+
+        }
+
+        .register-btn {
+
+            width: 100%;
+
+            padding: 12px;
+
+            margin-top: 5px;
+
+            border: none;
+
+            border-radius: 7px;
+
+            background: #2563eb;
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .register-btn:hover {
+
+            background: #1d4ed8;
+
+        }
+
+        .message {
+
+            display: none;
+
+            text-align: center;
+
+            margin-top: 15px;
+
+            font-size: 14px;
+
+            padding: 10px;
+
+            border-radius: 6px;
+        }
+
+        .success {
+
+            display: block;
+
+            color: #166534;
+
+            background: #dcfce7;
+
+        }
+
+        .error {
+
+            display: block;
+
+            color: #991b1b;
+
+            background: #fee2e2;
+
+        }
+
+        .login-section {
+
+            text-align: center;
+
+            margin-top: 22px;
+
+            padding-top: 18px;
+
+            border-top: 1px solid #eee;
+
+            color: #555;
+
+            font-size: 14px;
+        }
+
+        .login-btn {
+
+            display: inline-block;
+
+            margin-top: 10px;
+
+            padding: 9px 25px;
+
+            border: 1px solid #2563eb;
+
+            border-radius: 7px;
+
+            text-decoration: none;
+
+            color: #2563eb;
+
+            font-weight: bold;
+        }
+
+        .login-btn:hover {
+
+            background: #2563eb;
+
+            color: white;
+
+        }
+
+    </style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    </head>
+<body>
+
+    <div class="registration-container">
+
+        <div class="title">
+            NIIT Smart Student Companion
+        </div>
+
+        <div class="subtitle">
+            Student Academic Management System
+        </div>
+
+        <h2>
+            Create Account
+        </h2>
+
+
+        <form id="registrationForm">
+
+
+            <!-- NAME -->
+
+            <div class="form-group">
+
+                <label for="name">
+                    Full Name
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    placeholder="Enter your full name"
+                    required
+                >
+
+            </div>
+
+
+            <!-- EMAIL -->
+
+            <div class="form-group">
+
+                <label for="email">
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="Enter your email"
+                    required
+                >
+
+            </div>
+
+
+            <!-- MOBILE -->
+
+            <div class="form-group">
+
+                <label for="mobile">
+                    Mobile Number
+                </label>
+
+                <input
+                    type="tel"
+                    id="mobile"
+                    placeholder="Enter mobile number"
+                    required
+                >
+
+            </div>
+
+
+            <!-- COURSE -->
+
+            <div class="form-group">
+
+                <label for="course">
+                    Course
+                </label>
+
+                <select id="course" required>
+
+                    <option value="">
+                        Select Course
+                    </option>
+
+                    <option value="B.Sc Computer Science">
+                        B.Sc Computer Science
+                    </option>
+
+                    <option value="BCA">
+                        BCA
+                    </option>
+
+                    <option value="B.Sc IT">
+                        B.Sc IT
+                    </option>
+
+                    <option value="M.Sc Computer Science">
+                        M.Sc Computer Science
+                    </option>
+
+                </select>
+
+            </div>
+
+            
+<!-- YEAR -->
+
+<div class="form-group">
+    <label for="year">Year</label>
+
+    <select id="year" required>
+        <option value="">Select Year</option>
+        <option value="1st Year">1st Year</option>
+        <option value="2nd Year">2nd Year</option>
+        <option value="3rd Year">3rd Year</option>
+    </select>
+</div>
+
+<!-- SEMESTER -->
+
+<div class="form-group">
+    <label for="semester">Semester</label>
+
+    <select id="semester" required>
+        <option value="">Select Semester</option>
+        <option value="1">Semester 1</option>
+        <option value="2">Semester 2</option>
+        <option value="3">Semester 3</option>
+        <option value="4">Semester 4</option>
+        <option value="5">Semester 5</option>
+        <option value="6">Semester 6</option>
+    </select>
+</div>
+
+
+
+            <!-- PASSWORD -->
+
+            <div class="form-group">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Create password"
+                    required
+                >
+
+            </div>
+
+
+            <!-- CONFIRM PASSWORD -->
+
+            <div class="form-group">
+
+                <label for="confirmPassword">
+                    Confirm Password
+                </label>
+
+                <input
+                    type="password"
+                    id="confirmPassword"
+                    placeholder="Confirm password"
+                    required
+                >
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="register-btn">
+
+                Register
+
+            </button>
+
+
+        </form>
+
+
+        <!-- MESSAGE -->
+
+        <div
+            id="message"
+            class="message">
+        </div>
+
+
+        <!-- LOGIN -->
+
+        <div class="login-section">
+
+            Already have an account<i class="fa-solid fa-gear" aria-hidden="true"></i>
+
+            <br>
+
+            <a
+                href="login.html"
+                class="login-btn">
+
+                Login
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <script src="js/student-registration.js"></script>
+
+</body>
+
+</html>

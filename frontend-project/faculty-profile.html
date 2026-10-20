@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="images/icon-512.png">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Faculty - Profile</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+        }
+
+        header {
+            background: #1e3a8a;
+            color: white;
+
+            padding: 20px 30px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h2 {
+            margin: 0;
+        }
+
+        .back-button {
+            background: white;
+            color: #1e3a8a;
+
+            border: none;
+            padding: 10px 20px;
+
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .back-button:hover {
+            background: #e5e7eb;
+        }
+
+        .container {
+            padding: 30px;
+
+            max-width: 900px;
+
+            margin: auto;
+        }
+
+        .profile-card {
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-icon {
+            width: 90px;
+            height: 90px;
+
+            margin: 0 auto 20px;
+
+            border-radius: 50%;
+
+            background: #1e3a8a;
+
+            color: white;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            font-size: 42px;
+        }
+
+        .profile-card h2 {
+            text-align: center;
+
+            color: #1e3a8a;
+
+            margin-bottom: 25px;
+        }
+
+        .profile-row {
+            display: flex;
+
+            justify-content: space-between;
+
+            padding: 15px;
+
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .profile-row:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .value {
+            color: #222;
+        }
+
+        @media (max-width: 600px) {
+
+            .profile-row {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+        }
+
+    </style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    </head>
+<body>
+
+<header>
+
+    <h2><i class="fa-solid fa-circle-user" aria-hidden="true"></i> Faculty Profile</h2>
+
+    <button
+        class="back-button"
+        onclick="goBack()">
+
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Dashboard
+
+    </button>
+
+</header>
+
+<div class="container">
+
+    <div class="profile-card">
+
+        <div class="profile-icon">
+            <i class="fa-solid fa-circle-user" aria-hidden="true"></i>
+        </div>
+
+        <h2>
+            Faculty Information
+        </h2>
+
+        <div class="profile-row">
+
+            <span class="label">
+                Faculty ID
+            </span>
+
+            <span
+                class="value"
+                id="facultyId">
+
+                -
+
+            </span>
+
+        </div>
+
+        <div class="profile-row">
+
+            <span class="label">
+                Full Name
+            </span>
+
+            <span
+                class="value"
+                id="facultyName">
+
+                -
+
+            </span>
+
+        </div>
+
+        <div class="profile-row">
+
+            <span class="label">
+                Email
+            </span>
+
+            <span
+                class="value"
+                id="facultyEmail">
+
+                -
+
+            </span>
+
+        </div>
+
+        <div class="profile-row">
+
+            <span class="label">
+                Phone
+            </span>
+
+            <span
+                class="value"
+                id="facultyPhone">
+
+                -
+
+            </span>
+
+        </div>
+
+        <div class="profile-row">
+
+            <span class="label">
+                Department
+            </span>
+
+            <span
+                class="value"
+                id="facultyDepartment">
+
+                -
+
+            </span>
+
+        </div>
+
+        <div class="profile-row">
+
+            <span class="label">
+                Designation
+            </span>
+
+            <span
+                class="value"
+                id="facultyDesignation">
+
+                -
+
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="js/faculty-profile.js"></script>
+
+</body>
+
+</html>

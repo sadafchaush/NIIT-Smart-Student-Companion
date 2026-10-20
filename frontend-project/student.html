@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="images/icon-512.png">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Student Dashboard - NIIT Smart Student Companion</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+        }
+
+        /* Header */
+
+        .header {
+            background: #1e3a8a;
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+        }
+
+        .logout-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .logout-btn:hover {
+            background: #b91c1c;
+        }
+
+        /* Main Container */
+
+        .container {
+            padding: 30px;
+        }
+
+        /* Welcome Section */
+
+        .welcome {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .welcome h2 {
+            color: #1e3a8a;
+            margin-bottom: 10px;
+        }
+
+        .welcome p {
+            color: #555;
+        }
+
+        /* Dashboard Cards */
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .card h3 {
+            color: #1e3a8a;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .card button {
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .card button:hover {
+            background: #172554;
+        }
+
+    </style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    </head>
+<body>
+
+<!-- Header -->
+
+<div class="header">
+
+    <h1>NIIT Smart Student Companion</h1>
+
+    <button class="logout-btn" onclick="logout()">
+        Logout
+    </button>
+
+</div>
+
+
+<!-- Main Content -->
+
+<div class="container">
+
+
+    <!-- Welcome -->
+
+    <div class="welcome">
+
+        <h2>
+            Welcome, <span id="studentName">Student</span>! 
+        </h2>
+
+        <p>
+            Manage your academic activities from your dashboard.
+        </p>
+
+    </div>
+
+
+    <!-- Dashboard Cards -->
+
+    <div class="dashboard-grid">
+
+
+        <!-- Notes -->
+
+        <div class="card">
+
+            <div class="card-icon"><i class="fa-solid fa-book-open" aria-hidden="true"></i></div>
+
+            <h3>Notes</h3>
+
+            <p>
+                View and download study notes.
+            </p>
+
+            <button onclick="openNotes()">
+                View Notes
+            </button>
+
+        </div>
+
+
+        <!-- Assignments -->
+
+        <div class="card">
+
+            <div class="card-icon"><i class="fa-solid fa-file-pen" aria-hidden="true"></i></div>
+
+            <h3>Assignments</h3>
+
+            <p>
+                View and submit assignments.
+            </p>
+
+            <button onclick="openAssignments()">
+                View Assignments
+            </button>
+
+        </div>
+
+
+        <!-- Attendance -->
+
+        <div class="card">
+
+            <div class="card-icon"><i class="fa-solid fa-chart-column" aria-hidden="true"></i></div>
+
+            <h3>Attendance</h3>
+
+            <p>
+                Check your attendance records.
+            </p>
+
+            <button onclick="openAttendance()">
+                View Attendance
+            </button>
+
+        </div>
+
+
+        <!-- Announcements -->
+
+        <div class="card">
+
+            <div class="card-icon"><i class="fa-solid fa-bullhorn" aria-hidden="true"></i></div>
+
+            <h3>Announcements</h3>
+
+            <p>
+                View latest announcements.
+            </p>
+
+            <button onclick="openAnnouncements()">
+                View Announcements
+            </button>
+
+        </div>
+
+
+        <!-- Subjects -->
+
+        <div class="card">
+
+            <div class="card-icon"><i class="fa-solid fa-book-open" aria-hidden="true"></i></div>
+
+            <h3>Subjects</h3>
+
+            <p>
+                View your subjects and syllabus.
+            </p>
+
+            <button onclick="openSubjects()">
+                View Subjects
+            </button>
+
+        </div>
+
+
+        <!-- Profile -->
+
+        <div class="card">
+
+            <div class="card-icon"><i class="fa-solid fa-circle-user" aria-hidden="true"></i></div>
+
+            <h3>Profile</h3>
+
+            <p>
+                View your profile information.
+            </p>
+
+            <button onclick="openProfile()">
+                View Profile
+            </button>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<script>
+
+    // Check logged-in user
+
+    const userData =
+        localStorage.getItem("loggedInUser");
+
+
+    if (!userData) {
+
+        window.location.href =
+            "login.html";
+
+    } else {
+
+        const user =
+            JSON.parse(userData);
+
+        document.getElementById("studentName").textContent =
+            user.name || "Student";
+
+    }
+
+
+    // Logout
+
+    function logout() {
+
+        localStorage.removeItem(
+            "loggedInUser"
+        );
+
+        window.location.href =
+            "login.html";
+
+    }
+
+
+    // Module Navigation
+
+    function openNotes() {
+        alert("Notes module coming next!");
+    }
+
+    function openAssignments() {
+        alert("Assignments module coming next!");
+    }
+
+    function openAttendance() {
+        alert("Attendance module coming next!");
+    }
+
+    function openAnnouncements() {
+        alert("Announcements module coming next!");
+    }
+
+    function openSubjects() {
+        window.location.href = "subjects.html";
+    }
+
+    function openProfile() {
+        alert("Profile module coming next!");
+    }
+
+</script>
+
+</body>
+
+</html>

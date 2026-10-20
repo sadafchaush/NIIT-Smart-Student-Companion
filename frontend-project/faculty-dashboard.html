@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="images/icon-512.png">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Faculty Dashboard</title>
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            min-height: 100vh;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .header {
+            background: #1e3a8a;
+            color: white;
+            padding: 18px 40px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 25px;
+            font-weight: 700;
+
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header h1 i {
+            font-size: 25px;
+        }
+
+        .logout {
+            background: #dc2626;
+            color: white;
+
+            border: none;
+
+            padding: 11px 20px;
+
+            border-radius: 7px;
+
+            cursor: pointer;
+
+            font-size: 14px;
+            font-weight: bold;
+
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            transition: background 0.2s ease;
+        }
+
+        .logout:hover {
+            background: #b91c1c;
+        }
+
+        /* =========================
+           MAIN CONTAINER
+        ========================= */
+
+        .container {
+            width: 100%;
+            max-width: 1500px;
+
+            margin: 0 auto;
+
+            padding: 35px 45px 45px;
+        }
+
+        /* =========================
+           WELCOME SECTION
+        ========================= */
+
+        .welcome {
+            background: white;
+
+            padding: 28px 32px;
+
+            border-radius: 14px;
+
+            margin-bottom: 32px;
+
+            border-left: 5px solid #1e3a8a;
+
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .welcome h2 {
+            margin-bottom: 8px;
+
+            color: #1e3a8a;
+
+            font-size: 30px;
+        }
+
+        .welcome p {
+            color: #4b5563;
+
+            font-size: 17px;
+
+            line-height: 1.5;
+        }
+
+/* CARDS GRID */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 28px;
+    width: 100%;
+    align-items: stretch;
+}
+
+/* CARD */
+.card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 28px;
+    min-height: 285px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* CARD DESCRIPTION */
+.card p {
+    color: #4b5563;
+    font-size: 15px;
+    line-height: 1.6;
+    max-width: 280px;
+    min-height: 50px;
+}
+
+
+        /* =========================
+           CARD BUTTON
+        ========================= */
+
+        .card button {
+            background: #1e3a8a;
+
+            color: white;
+
+            border: none;
+
+            padding: 13px 20px;
+
+            border-radius: 7px;
+
+            cursor: pointer;
+
+            font-size: 15px;
+
+            font-weight: bold;
+
+            min-width: 210px;
+
+            transition:
+                background 0.2s ease;
+        }
+
+        .card button i {
+            margin-left: 9px;
+
+            font-size: 12px;
+        }
+
+        .card button:hover {
+            background: #172554;
+        }
+
+        /* =========================
+           TABLET
+        ========================= */
+
+        @media (max-width: 1100px) {
+
+            .cards {
+                grid-template-columns:
+                    repeat(3, 1fr);
+            }
+
+        }
+
+        /* =========================
+           SMALL TABLET
+        ========================= */
+
+        @media (max-width: 800px) {
+
+            .header {
+                padding: 16px 22px;
+            }
+
+            .container {
+                padding: 25px 22px 35px;
+            }
+
+            .cards {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+        }
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 600px) {
+
+            .header {
+                padding: 15px 18px;
+
+                gap: 12px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .header h1 i {
+                font-size: 20px;
+            }
+
+            .logout {
+                padding: 9px 12px;
+
+                font-size: 12px;
+            }
+
+            .container {
+                padding: 20px 15px 30px;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+
+                gap: 20px;
+            }
+
+            .card {
+                min-height: 27px;
+            }
+
+            .welcome {
+                padding: 22px;
+            }
+
+            .welcome h2 {
+                font-size: 24px;
+            }
+
+            .welcome p {
+                font-size: 14px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         HEADER
+    ========================= -->
+
+    <div class="header">
+
+        <h1>
+
+            <i class="fa-solid fa-chalkboard-user"></i>
+
+            Faculty Dashboard
+
+        </h1>
+
+
+        <button
+            type="button"
+            class="logout"
+            onclick="logout()">
+
+            <i class="fa-solid fa-right-from-bracket"></i>
+
+            Logout
+
+        </button>
+
+    </div>
+
+
+
+    <!-- =========================
+         MAIN
+    ========================= -->
+
+    <div class="container">
+
+
+        <!-- WELCOME -->
+
+        <div class="welcome">
+
+            <h2>
+
+                Welcome,
+                <span id="facultyName">
+                    Faculty
+                </span>!
+
+            </h2>
+
+            <p>
+
+                Welcome to the
+                NIIT Smart Student Companion
+                Faculty Portal.
+
+            </p>
+
+        </div>
+
+
+
+        <!-- =========================
+             CARDS
+        ========================= -->
+
+        <div class="cards">
+
+
+            <!-- NOTES -->
+
+            <div class="card">
+
+                <div>
+
+                    <h3>
+
+                        <i class="fa-solid fa-book-open"></i>
+
+                        Notes
+
+                    </h3>
+
+                    <p>
+
+                        Upload and manage study
+                        notes for students.
+
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    onclick="openNotes()">
+
+                    Manage Notes
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </button>
+
+            </div>
+
+
+
+            <!-- ASSIGNMENTS -->
+
+            <div class="card">
+
+                <div>
+
+                    <h3>
+
+                        <i class="fa-solid fa-file-pen"></i>
+
+                        Assignments
+
+                    </h3>
+
+                    <p>
+
+                        Create and manage
+                        assignments for students.
+
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    onclick="openAssignments()">
+
+                    Manage Assignments
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </button>
+
+            </div>
+
+
+
+            <!-- ATTENDANCE -->
+
+            <div class="card">
+
+                <div>
+
+                    <h3>
+
+                        <i class="fa-solid fa-chart-column"></i>
+
+                        Attendance
+
+                    </h3>
+
+                    <p>
+
+                        Mark and manage student
+                        attendance.
+
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    onclick="openAttendance()">
+
+                    Manage Attendance
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </button>
+
+            </div>
+
+
+
+            <!-- ANNOUNCEMENTS -->
+
+            <div class="card">
+
+                <div>
+
+                    <h3>
+
+                        <i class="fa-solid fa-bullhorn"></i>
+
+                        Announcements
+
+                    </h3>
+
+                    <p>
+
+                        Create and post
+                        announcements for students.
+
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    onclick="openAnnouncements()">
+
+                    Manage Announcements
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </button>
+
+            </div>
+
+
+
+            <!-- SUBJECTS -->
+
+            <div class="card">
+
+                <div>
+
+                    <h3>
+
+                        <i class="fa-solid fa-book"></i>
+
+                        Subjects
+
+                    </h3>
+
+                    <p>
+
+                        View subjects assigned
+                        to you.
+
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    onclick="openSubjects()">
+
+                    View Subjects
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </button>
+
+            </div>
+
+
+            <!-- MESSAGES -->
+
+            <div class="card">
+
+                <div>
+
+                    <h3>
+
+                        <i class="fa-solid fa-comments"></i>
+
+                        Messages
+
+                    </h3>
+
+                    <p>
+
+                        Chat directly with your students.
+
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    onclick="openMessages()">
+
+                    Open Messages
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </button>
+
+            </div>
+
+
+            <!-- STUDENTS -->
+
+            <div class="card">
+
+                <div>
+
+                    <h3>
+
+                        <i class="fa-solid fa-user-graduate"></i>
+
+                        Students
+
+                    </h3>
+
+                    <p>
+
+                        View the list of students.
+
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    onclick="openStudents()">
+
+                    View Students
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </button>
+
+            </div>
+
+
+
+            
+            <!-- PROFILE -->
+            <div class="card">
+                <div>
+                    <h3>
+                        <i class="fa-solid fa-user"></i>
+                        Profile
+                    </h3>
+                    <p>View your faculty profile.</p>
+                </div>
+
+                <button type="button" onclick="openProfile()">
+                    View Profile
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- QUESTION PAPERS -->
+            <div class="card">
+                <div>
+                    <h3>
+                        <i class="fa-solid fa-file-pdf"></i>
+                        Question Papers
+                    </h3>
+                    <p>
+                        Upload previous examination papers for your assigned subjects.
+                    </p>
+                </div>
+
+                <button type="button" onclick="openQuestionPapers()">
+                    Upload Question Papers
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+
+        </div>
+
+
+
+
+    <!-- =========================
+     FACULTY ROLE ACCESS CONTROL
+========================= -->
+
+<script src="js/auth.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // Allow only FACULTY users
+        if (!requireRole("FACULTY")) {
+            return;
+        }
+
+        // Get logged-in faculty user
+        const user = getLoggedInUser();
+
+        // Display faculty name
+        const facultyName =
+            document.getElementById("facultyName");
+
+        if (facultyName && user) {
+
+            facultyName.textContent =
+                user.name ||
+                user.fullName ||
+                "Faculty";
+        }
+
+        console.log(
+            "Faculty dashboard access granted."
+        );
+
+    });
+</script>
+
+
+<!-- =========================
+     FACULTY DASHBOARD BUTTON FUNCTIONS
+========================= -->
+
+<script>
+
+    function openNotes() {
+        window.location.href = "faculty-notes.html";
+    }
+
+    function openAssignments() {
+        window.location.href = "faculty-assignments.html";
+    }
+
+    function openAttendance() {
+        window.location.href = "faculty-attendance.html";
+    }
+
+    function openAnnouncements() {
+        window.location.href = "faculty-announcements.html";
+    }
+
+    function openSubjects() {
+        window.location.href = "faculty-subjects.html";
+    }
+
+    function openStudents() {
+        window.location.href = "faculty-students.html";
+    }
+
+    function openMessages() {
+        window.location.href = "messages.html";
+    }
+
+    function openProfile() {
+        window.location.href = "faculty-profile.html";
+    }
+
+</script>
+
+
+    <!-- =========================
+         FACULTY DASHBOARD BUTTON FUNCTIONS
+    ========================= -->
+
+    <script>
+
+        function openNotes() {
+
+            window.location.href =
+                "faculty-notes.html";
+
+        }
+
+
+        function openAssignments() {
+
+            window.location.href =
+                "faculty-assignments.html";
+
+        }
+
+
+        function openAttendance() {
+
+            window.location.href =
+                "faculty-attendance.html";
+
+        }
+
+
+        function openAnnouncements() {
+
+            window.location.href =
+                "faculty-announcements.html";
+
+        }
+
+
+        function openSubjects() {
+
+            window.location.href =
+                "faculty-subjects.html";
+
+        }
+
+
+        function openStudents() {
+
+            window.location.href =
+                "faculty-students.html";
+
+        }
+
+
+        function openProfile() {
+
+            window.location.href =
+                "faculty-profile.html";
+
+        }
+
+        function openQuestionPapers() {
+    window.location.href = "faculty-question-papers.html";
+}
+
+    </script>
+
+
+</body>
+
+</html>

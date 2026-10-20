@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="images/icon-512.png">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Announcements</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+        }
+
+        header {
+            background: #1e3a8a;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            padding: 30px;
+        }
+
+        .announcement-card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .announcement-card h3 {
+            color: #1e3a8a;
+            margin-top: 0;
+        }
+
+        .announcement-date {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .error {
+            color: red;
+            text-align: center;
+        }
+
+        .back-btn {
+            background: white;
+            color: #1e3a8a;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            background: #e5e7eb;
+        }
+
+    </style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    </head>
+<body>
+
+    <header>
+
+        <h2><i class="fa-solid fa-bullhorn" aria-hidden="true"></i> Announcements</h2>
+
+        <button
+            class="back-btn"
+            onclick="goBack()">
+
+            <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Dashboard
+
+        </button>
+
+    </header>
+
+    <div class="container">
+
+        <div id="announcementsContainer">
+
+            <p>Loading announcements...</p>
+
+        </div>
+
+    </div>
+
+    <script src="js/announcement.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="images/icon-512.png">
+
+<title>Student API Test</title>
+
+</head>
+
+<body>
+
+
+<h1>Student API Test</h1>
+
+<p id="status">Loading...</p>
+
+<table border="1" id="studentTable">
+
+    <thead>
+
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Mobile</th>
+            <th>Course</th>
+        </tr>
+
+    </thead>
+
+    <tbody id="studentTableBody">
+
+    </tbody>
+
+</table>
+
+
+<script>
+
+    const API_URL =
+        "http://localhost:8081/students";
+
+
+    async function loadStudents() {
+
+        try {
+
+            console.log(
+                "Calling API:",
+                API_URL
+            );
+
+
+            const response =
+                await fetch(API_URL);
+
+
+            console.log(
+                "Response status:",
+                response.status
+            );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "HTTP Error: " +
+                    response.status
+                );
+
+            }
+
+
+            const students =
+                await response.json();
+
+
+            console.log(
+                "API DATA:",
+                students
+            );
+
+
+            const tableBody =
+                document.getElementById(
+                    "studentTableBody"
+                );
+
+
+            tableBody.innerHTML = "";
+
+
+            students.forEach(
+                function(student) {
+
+                    console.log(
+                        "Student:",
+                        student
+                    );
+
+
+                    const row =
+                        document.createElement(
+                            "tr"
+                        );
+
+
+                    row.innerHTML = `
+
+                        <td>
+                            ${student.id}
+                        </td>
+
+                        <td>
+                            ${student.name}
+                        </td>
+
+                        <td>
+                            ${student.email}
+                        </td>
+
+                        <td>
+                            ${student.mobile}
+                        </td>
+
+                        <td>
+                            ${student.course}
+                        </td>
+
+                    `;
+
+
+                    tableBody.appendChild(
+                        row
+                    );
+
+                }
+            );
+
+
+            document.getElementById(
+                "status"
+            ).textContent =
+                "Students loaded successfully!";
+
+
+        } catch (error) {
+
+            console.error(
+                "ERROR:",
+                error
+            );
+
+
+            document.getElementById(
+                "status"
+            ).textContent =
+                "Error: " +
+                error.message;
+
+        }
+
+    }
+
+
+    loadStudents();
+
+</script>
+
+</body>
+
+</html>

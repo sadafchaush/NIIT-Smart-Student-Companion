@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="images/icon-512.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>GPA Calculator</title>
+
+    <link rel="stylesheet" href="css/gpa-calculator.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div>
+            <h1>GPA Calculator</h1>
+            <p>Calculate your Semester GPA</p>
+        </div>
+
+        <button class="back-btn" onclick="goBack()"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back</button>
+    </header>
+
+
+    <!-- Main Container -->
+    <main class="container">
+
+        <div class="card">
+
+            <h2>Enter Subject Details</h2>
+
+            <p class="info">
+                Enter the credits and grade obtained in each subject.
+            </p>
+
+
+            <!-- Subject Table -->
+            <div class="table-container">
+
+                <table id="subjectTable">
+
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Credits</th>
+                            <th>Grade</th>
+                            <th>Grade Point</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="subjectTableBody">
+
+                        <tr>
+                            <td>
+                                <input type="text"
+                                       class="subject"
+                                       placeholder="Subject name">
+                            </td>
+
+                            <td>
+                                <input type="number"
+                                       class="credits"
+                                       min="1"
+                                       max="10"
+                                       placeholder="Credits">
+                            </td>
+
+                            <td>
+                                <select class="grade">
+                                    <option value="">Select Grade</option>
+                                    <option value="10">O</option>
+                                    <option value="9">A+</option>
+                                    <option value="8">A</option>
+                                    <option value="7">B+</option>
+                                    <option value="6">B</option>
+                                    <option value="5">C</option>
+                                    <option value="4">D</option>
+                                    <option value="0">F</option>
+                                </select>
+                            </td>
+
+                            <td>
+                                <span class="grade-point">-</span>
+                            </td>
+
+                            <td>
+                                <button class="remove-btn"
+                                        onclick="removeSubject(this)">
+                                    Remove
+                                </button>
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- Buttons -->
+            <div class="button-container">
+
+                <button class="add-btn" onclick="addSubject()">
+                    + Add Subject
+                </button>
+
+                <button class="calculate-btn" onclick="calculateGPA()">
+                    Calculate GPA
+                </button>
+
+                <button class="reset-btn" onclick="resetCalculator()">
+                    Reset
+                </button>
+
+            </div>
+
+
+            <!-- Result -->
+            <div id="result" class="result hidden">
+
+                <h2>Your GPA</h2>
+
+                <div id="gpaValue" class="gpa-value">
+                    0.00
+                </div>
+
+                <p id="gpaMessage"></p>
+
+            </div>
+
+
+            <!-- Grade Scale -->
+            <div class="grade-scale">
+
+                <h2>Grade Scale</h2>
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Grade</th>
+                            <th>Grade Point</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td>O</td>
+                            <td>10</td>
+                        </tr>
+
+                        <tr>
+                            <td>A+</td>
+                            <td>9</td>
+                        </tr>
+
+                        <tr>
+                            <td>A</td>
+                            <td>8</td>
+                        </tr>
+
+                        <tr>
+                            <td>B+</td>
+                            <td>7</td>
+                        </tr>
+
+                        <tr>
+                            <td>B</td>
+                            <td>6</td>
+                        </tr>
+
+                        <tr>
+                            <td>C</td>
+                            <td>5</td>
+                        </tr>
+
+                        <tr>
+                            <td>D</td>
+                            <td>4</td>
+                        </tr>
+
+                        <tr>
+                            <td>F</td>
+                            <td>0</td>
+                        </tr>
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <script src="js/gpa-calculator.js"></script>
+
+</body>
+
+</html>

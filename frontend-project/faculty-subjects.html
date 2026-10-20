@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="images/icon-512.png">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Faculty - Subjects</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            color: #222;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        header {
+            background: #1e3a8a;
+            color: white;
+
+            padding: 20px 40px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h2 {
+            font-size: 28px;
+            margin: 0;
+        }
+
+        .back-button {
+            background: white;
+            color: #1e3a8a;
+
+            border: none;
+
+            padding: 12px 25px;
+
+            border-radius: 6px;
+
+            cursor: pointer;
+
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .back-button:hover {
+            background: #e5e7eb;
+        }
+
+        /* =========================
+           CONTAINER
+        ========================= */
+
+        .container {
+            padding: 30px;
+        }
+
+        .card {
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 2px 8px rgba(0, 0, 0, 0.10);
+
+            overflow-x: auto;
+        }
+
+        /* =========================
+           TITLE
+        ========================= */
+
+        .card h3 {
+            color: #1e3a8a;
+
+            font-size: 25px;
+
+            margin-bottom: 25px;
+        }
+
+        /* =========================
+           TABLE
+        ========================= */
+
+        table {
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 800px;
+        }
+
+        thead {
+            background: #1e3a8a;
+            color: white;
+        }
+
+        th {
+            padding: 14px;
+
+            text-align: center;
+
+            font-size: 15px;
+        }
+
+        td {
+            padding: 13px;
+
+            text-align: center;
+
+            border-bottom: 1px solid #ddd;
+
+            font-size: 15px;
+        }
+
+        tbody tr:hover {
+            background: #f1f5f9;
+        }
+
+        /* =========================
+           VIEW BUTTON
+        ========================= */
+
+        .view-button {
+            background: #1e3a8a;
+
+            color: white;
+
+            border: none;
+
+            padding: 8px 15px;
+
+            border-radius: 5px;
+
+            cursor: pointer;
+
+            font-size: 14px;
+        }
+
+        .view-button:hover {
+            background: #172554;
+        }
+
+        /* =========================
+           MESSAGE
+        ========================= */
+
+        .message {
+            text-align: center;
+
+            padding: 25px;
+
+            font-size: 16px;
+        }
+
+        .loading {
+            color: #555;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .no-data {
+            color: #666;
+        }
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 700px) {
+
+            header {
+                padding: 15px;
+
+                flex-direction: column;
+
+                gap: 15px;
+
+                text-align: center;
+            }
+
+            header h2 {
+                font-size: 23px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+        }
+
+    </style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    </head>
+<body>
+
+<!-- =========================
+     HEADER
+========================= -->
+
+<header>
+
+    <h2>
+        <i class="fa-solid fa-book-open" aria-hidden="true"></i> Faculty - Subjects
+    </h2>
+
+    <button
+        class="back-button"
+        onclick="goBack()">
+
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Dashboard
+
+    </button>
+
+</header>
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<div class="container">
+
+    <div class="card">
+
+        <h3>
+            All Subjects
+        </h3>
+
+        <div id="message"
+             class="message loading">
+
+            Loading subjects...
+
+        </div>
+
+        <table id="subjectsTable"
+               style="display: none;">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        ID
+                    </th>
+
+                    <th>
+                        Subject Name
+                    </th>
+
+                    <th>
+                        Subject Code
+                    </th>
+
+                    <th>
+                        Course
+                    </th>
+
+                    <th>
+                        Semester
+                    </th>
+
+                    <th>
+                        Actions
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="subjectsBody">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<!-- =========================
+     JAVASCRIPT
+========================= -->
+
+<script src="js/faculty-subjects.js"></script>
+
+</body>
+
+</html>

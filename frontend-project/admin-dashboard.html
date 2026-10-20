@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="images/icon-512.png">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard - NIIT Smart Student Companion</title>
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            min-height: 100vh;
+        }
+
+        /* ============================= */
+        /* HEADER */
+        /* ============================= */
+
+        .header {
+            background: #1e3a8a;
+            color: white;
+
+            padding: 18px 40px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            box-shadow:
+                0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .header h1 {
+            margin: 0;
+
+            font-size: 25px;
+            font-weight: 700;
+
+            display: flex;
+            align-items: center;
+
+            gap: 12px;
+        }
+
+        .header h1 i {
+            font-size: 25px;
+        }
+
+        .logout-btn {
+            background: #dc2626;
+            color: white;
+
+            border: none;
+
+            padding: 11px 20px;
+
+            border-radius: 7px;
+
+            cursor: pointer;
+
+            font-size: 14px;
+            font-weight: bold;
+
+            display: flex;
+            align-items: center;
+
+            gap: 8px;
+
+            transition: background 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: #b91c1c;
+        }
+
+
+        /* ============================= */
+        /* MAIN CONTAINER */
+        /* ============================= */
+
+        .container {
+            width: 100%;
+
+            max-width: 1500px;
+
+            margin: 0 auto;
+
+            padding: 35px 45px 45px;
+        }
+
+
+        /* ============================= */
+        /* WELCOME */
+        /* ============================= */
+
+        .welcome {
+            background: white;
+
+            padding: 28px 32px;
+
+            border-radius: 14px;
+
+            margin-bottom: 32px;
+
+            border-left: 5px solid #1e3a8a;
+
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .welcome h2 {
+            color: #1e3a8a;
+
+            margin-bottom: 8px;
+
+            font-size: 30px;
+        }
+
+        .welcome p {
+            color: #4b5563;
+
+            font-size: 17px;
+
+            line-height: 1.5;
+        }
+
+
+        /* ============================= */
+        /* CARDS */
+        /* ============================= */
+
+        .cards {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 28px;
+
+            width: 100%;
+        }
+
+        .card {
+            background: white;
+
+            width: 100%;
+
+            min-height: 285px;
+
+            padding: 28px 24px;
+
+            border-radius: 14px;
+
+            text-align: center;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.08);
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+
+            box-shadow:
+                0 8px 20px rgba(0, 0, 0, 0.13);
+        }
+
+
+        /* ============================= */
+        /* ICON */
+        /* ============================= */
+
+        .card-icon {
+            font-size: 32px;
+
+            color: #1e3a8a;
+
+            margin-bottom: 12px;
+        }
+
+
+        /* ============================= */
+        /* CARD TITLE */
+        /* ============================= */
+
+        .card h3 {
+            color: #1e3a8a;
+
+            font-size: 23px;
+
+            margin-bottom: 12px;
+
+            line-height: 1.3;
+        }
+
+
+        /* ============================= */
+        /* CARD DESCRIPTION */
+        /* ============================= */
+
+        .card p {
+            color: #4b5563;
+
+            font-size: 15px;
+
+            line-height: 1.6;
+
+            max-width: 280px;
+
+            min-height: 50px;
+        }
+
+
+        /* ============================= */
+        /* CARD BUTTON */
+        /* ============================= */
+
+        .card button {
+            background: #1e3a8a;
+
+            color: white;
+
+            border: none;
+
+            padding: 13px 20px;
+
+            border-radius: 7px;
+
+            cursor: pointer;
+
+            font-size: 15px;
+
+            font-weight: bold;
+
+            min-width: 210px;
+
+            transition: background 0.2s ease;
+        }
+
+        .card button i {
+            margin-left: 9px;
+
+            font-size: 12px;
+        }
+
+        .card button:hover {
+            background: #172554;
+        }
+
+
+        /* ============================= */
+        /* RESPONSIVE */
+        /* ============================= */
+
+        @media (max-width: 1100px) {
+
+            .cards {
+                grid-template-columns:
+                    repeat(3, 1fr);
+            }
+
+        }
+
+
+        @media (max-width: 800px) {
+
+            .header {
+                padding: 16px 22px;
+            }
+
+            .container {
+                padding:
+                    25px 22px 35px;
+            }
+
+            .cards {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+        }
+
+
+        @media (max-width: 600px) {
+
+            .header {
+                padding: 15px 18px;
+
+                gap: 12px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .header h1 i {
+                font-size: 20px;
+            }
+
+            .logout-btn {
+                padding: 9px 12px;
+
+                font-size: 12px;
+            }
+
+            .container {
+                padding:
+                    20px 15px 30px;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+
+                gap: 20px;
+            }
+
+            .card {
+                min-height: 270px;
+            }
+
+            .welcome {
+                padding: 22px;
+            }
+
+            .welcome h2 {
+                font-size: 24px;
+            }
+
+            .welcome p {
+                font-size: 14px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- ============================= -->
+    <!-- HEADER -->
+    <!-- ============================= -->
+
+    <header class="header">
+
+        <h1>
+
+            <i class="fa-solid fa-user-shield"></i>
+
+            Admin Dashboard
+
+        </h1>
+
+
+        <button
+            type="button"
+            class="logout-btn"
+            onclick="handleAdminLogout()">
+
+            <i class="fa-solid fa-right-from-bracket"></i>
+
+            Logout
+
+        </button>
+
+    </header>
+
+
+
+    <!-- ============================= -->
+    <!-- MAIN -->
+    <!-- ============================= -->
+
+    <main class="container">
+
+
+        <!-- WELCOME -->
+
+        <section class="welcome">
+
+            <h2>
+
+                Welcome,
+
+                <span id="adminName">
+                    Admin
+                </span>!
+
+            </h2>
+
+            <p>
+
+                Welcome to the NIIT Smart Student Companion
+                Admin Panel.
+
+            </p>
+
+        </section>
+
+
+
+        <!-- ============================= -->
+        <!-- ADMIN MODULES -->
+        <!-- ============================= -->
+
+        <section class="cards">
+
+
+            <!-- STUDENTS -->
+
+            <div class="card">
+
+                <div>
+
+                    <div class="card-icon">
+
+                        <i class="fa-solid fa-user-graduate"></i>
+
+                    </div>
+
+                    <h3>
+                        Students
+                    </h3>
+
+                    <p>
+                        Add, update, view and delete
+                        students.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    onclick="openStudents()">
+
+                    Manage Students
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </button>
+
+            </div>
+
+
+
+            <!-- FACULTY -->
+
+            <div class="card">
+
+                <div>
+
+                    <div class="card-icon">
+
+                        <i class="fa-solid fa-chalkboard-user"></i>
+
+                    </div>
+
+                    <h3>
+                        Faculty
+                    </h3>
+
+                    <p>
+                        Add, update, view and delete
+                        faculty members.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    onclick="openFaculty()">
+
+                    Manage Faculty
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </button>
+
+            </div>
+
+
+
+            <!-- SUBJECTS -->
+
+            <div class="card">
+
+                <div>
+
+                    <div class="card-icon">
+
+                        <i class="fa-solid fa-book"></i>
+
+                    </div>
+
+                    <h3>
+                        Subjects
+                    </h3>
+
+                    <p>
+                        Add and manage academic
+                        subjects.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    onclick="openSubjects()">
+
+                    Manage Subjects
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </button>
+
+            </div>
+
+
+
+            <!-- ANNOUNCEMENTS -->
+
+            <div class="card">
+
+                <div>
+
+                    <div class="card-icon">
+
+                        <i class="fa-solid fa-bullhorn"></i>
+
+                    </div>
+
+                    <h3>
+                        Announcements
+                    </h3>
+
+                    <p>
+                        Create and manage academic
+                        announcements.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    onclick="openAnnouncements()">
+
+                    Manage Announcements
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </button>
+
+            </div>
+
+
+
+            <!-- SYLLABUS -->
+
+            <div class="card">
+
+                <div>
+
+                    <div class="card-icon">
+
+                        <i class="fa-solid fa-book-open"></i>
+
+                    </div>
+
+                    <h3>
+                        Syllabus
+                    </h3>
+
+                    <p>
+                        Manage syllabus and academic
+                        information.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    onclick="openSyllabus()">
+
+                    Manage Syllabus
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </button>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+
+
+    <!-- ================================================== -->
+    <!-- COMMON AUTHENTICATION -->
+    <!-- ================================================== -->
+
+    <script src="js/auth.js"></script>
+
+
+    <!-- ================================================== -->
+    <!-- ADMIN JAVASCRIPT -->
+    <!-- ================================================== -->
+
+    <script>
+
+        // ================================================
+        // ADMIN SESSION CHECK
+        // ================================================
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                console.log(
+                    "Admin Dashboard loaded"
+                );
+
+
+                // ADMIN ONLY
+
+                if (!requireRole("ADMIN")) {
+
+                    console.log(
+                        "Admin authorization failed."
+                    );
+
+                    return;
+                }
+
+
+                // Get logged-in Admin
+
+                const user =
+                    getLoggedInUser();
+
+
+                console.log(
+                    "ADMIN SESSION:",
+                    user
+                );
+
+
+                // Display Admin name
+
+                const adminName =
+                    document.getElementById(
+                        "adminName"
+                    );
+
+
+                if (adminName && user) {
+
+                    adminName.textContent =
+                        user.name ||
+                        user.fullName ||
+                        "Admin";
+                }
+
+
+                console.log(
+                    "Admin dashboard access granted."
+                );
+
+            }
+        );
+
+
+
+        // ================================================
+        // STUDENTS
+        // ================================================
+
+        function openStudents() {
+
+            console.log(
+                "ADMIN → Students"
+            );
+
+            window.location.href =
+                "students.html";
+        }
+
+
+
+        // ================================================
+        // FACULTY
+        // ================================================
+
+        function openFaculty() {
+
+            console.log(
+                "ADMIN → Faculty"
+            );
+
+            window.location.href =
+                "faculty.html";
+        }
+
+
+
+        // ================================================
+        // SUBJECTS
+        // ================================================
+
+        function openSubjects() {
+
+            console.log(
+                "ADMIN → Subjects"
+            );
+
+            window.location.href =
+                "subjects.html";
+        }
+
+
+
+        // ================================================
+        // ANNOUNCEMENTS
+        // ================================================
+
+        function openAnnouncements() {
+
+            console.log(
+                "ADMIN → Announcements"
+            );
+
+            window.location.href =
+                "announcement.html";
+        }
+
+
+
+        // ================================================
+        // SYLLABUS
+        // ================================================
+
+        function openSyllabus() {
+
+            console.log(
+                "ADMIN → Syllabus"
+            );
+
+            window.location.href =
+                "syllabus.html";
+        }
+
+
+
+        // ================================================
+        // LOGOUT
+        // ================================================
+
+        function handleAdminLogout() {
+
+            localStorage.removeItem(
+                "loggedInUser"
+            );
+
+            localStorage.removeItem(
+                "userRole"
+            );
+
+            window.location.replace(
+                "login.html"
+            );
+        }
+
+    </script>
+
+
+</body>
+
+</html>

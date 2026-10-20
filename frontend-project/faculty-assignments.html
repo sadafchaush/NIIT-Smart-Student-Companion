@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="images/icon-512.png">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Faculty - Manage Assignments</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+        }
+
+        header {
+            background: #1e3a8a;
+            color: white;
+            padding: 20px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h2 {
+            margin: 0;
+        }
+
+        .back-button {
+            background: white;
+            color: #1e3a8a;
+
+            border: none;
+            padding: 10px 20px;
+
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .back-button:hover {
+            background: #e5e7eb;
+        }
+
+        .container {
+            padding: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+
+            box-shadow:
+                0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h3 {
+            color: #1e3a8a;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .save-button {
+            margin-top: 20px;
+
+            background: #1e3a8a;
+            color: white;
+
+            border: none;
+            padding: 12px 25px;
+
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .save-button:hover {
+            background: #172554;
+        }
+
+        .cancel-button {
+            margin-top: 20px;
+            margin-left: 10px;
+
+            background: #6b7280;
+            color: white;
+
+            border: none;
+            padding: 12px 25px;
+
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .cancel-button:hover {
+            background: #4b5563;
+        }
+
+        .assignments-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(280px, 1fr));
+
+            gap: 20px;
+        }
+
+        .assignment-card {
+            background: #f8fafc;
+
+            padding: 20px;
+            border-radius: 10px;
+
+            border-left: 5px solid #1e3a8a;
+
+            box-shadow:
+                0 2px 5px rgba(0, 0, 0, 0.08);
+        }
+
+        .assignment-card h4 {
+            color: #1e3a8a;
+            margin-top: 0;
+            font-size: 20px;
+        }
+
+        .assignment-card p {
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+
+        .edit-button {
+            background: #2563eb;
+            color: white;
+
+            border: none;
+            padding: 8px 15px;
+
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+
+        .edit-button:hover {
+            background: #1d4ed8;
+        }
+
+        .delete-button {
+            background: #dc2626;
+            color: white;
+
+            border: none;
+            padding: 8px 15px;
+
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .delete-button:hover {
+            background: #b91c1c;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .loading {
+            color: #666;
+        }
+
+        @media (max-width: 600px) {
+
+            header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .back-button {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    </head>
+<body>
+
+<header>
+
+    <h2>
+        <i class="fa-solid fa-file-pen" aria-hidden="true"></i> Faculty - Manage Assignments
+    </h2>
+
+    <button
+        type="button"
+        class="back-button"
+        onclick="goBack()">
+
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Dashboard
+
+    </button>
+
+</header>
+
+
+<div class="container">
+
+    <!-- ASSIGNMENT FORM -->
+
+    <div class="card">
+
+        <h3 id="formHeading">
+            <i class="fa-solid fa-circle-plus" aria-hidden="true"></i> Add New Assignment
+        </h3>
+
+        <form id="assignmentForm">
+
+            <label for="title">
+                Assignment Title
+            </label>
+
+            <input
+                type="text"
+                id="title"
+                placeholder="Enter assignment title"
+                required
+            >
+
+
+            <label for="description">
+                Description
+            </label>
+
+            <textarea
+                id="description"
+                placeholder="Enter assignment description"
+                required
+            ></textarea>
+
+
+            <label for="dueDate">
+                Due Date
+            </label>
+
+            <input
+                type="date"
+                id="dueDate"
+                required
+            >
+
+
+            <label for="subjectId">
+                Select Subject
+            </label>
+
+            <select
+                id="subjectId"
+                required>
+
+                <option value="">
+                    Loading subjects...
+                </option>
+
+            </select>
+
+
+            <button
+                type="submit"
+                class="save-button"
+                id="saveButton">
+
+                Save Assignment
+
+            </button>
+
+
+            <button
+                type="button"
+                class="cancel-button"
+                id="cancelButton"
+                style="display: none;"
+                onclick="cancelEdit()">
+
+                Cancel Edit
+
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- ALL ASSIGNMENTS -->
+
+    <div class="card">
+
+        <h3>
+            <i class="fa-solid fa-list-check" aria-hidden="true"></i> All Assignments
+        </h3>
+
+        <div
+            id="assignmentsContainer"
+            class="assignments-grid">
+
+            <div class="loading">
+                Loading assignments...
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="js/faculty-assignments.js"></script>
+
+<script>
+
+    function goBack() {
+        window.location.href = "faculty-dashboard.html";
+    }
+
+</script>
+
+</body>
+
+</html>

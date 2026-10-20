@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="images/icon-512.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>Question Papers - NIIT Smart Student Companion</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f4f6f9;
+    }
+
+    .header {
+        background: #1e3a8a;
+        color: white;
+        padding: 18px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header h2 {
+        margin: 0;
+    }
+
+    .back-btn {
+        background: white;
+        color: #1e3a8a;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .back-btn:hover {
+        background: #e5e7eb;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 30px auto;
+        padding: 0 20px;
+    }
+
+    .intro {
+        margin-bottom: 25px;
+    }
+
+    .intro h1 {
+        color: #1e3a8a;
+        margin-bottom: 8px;
+    }
+
+    .intro p {
+        color: #555;
+    }
+
+    .filters {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .filters select {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        min-width: 180px;
+    }
+
+    .papers-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    .paper-card {
+        background: white;
+        padding: 22px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .paper-card h3 {
+        color: #1e3a8a;
+        margin-top: 0;
+    }
+
+    .paper-card p {
+        margin: 8px 0;
+        color: #555;
+    }
+
+    .download-btn {
+        display: inline-block;
+        margin-top: 15px;
+        padding: 10px 16px;
+        background: #1e3a8a;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: bold;
+    }
+
+    .download-btn:hover {
+        background: #172f70;
+    }
+
+    .no-results {
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        text-align: center;
+        color: #777;
+        grid-column: 1 / -1;
+    }
+
+    @media (max-width: 600px) {
+        .header {
+            padding: 15px;
+        }
+
+        .container {
+            margin: 20px auto;
+        }
+
+        .filters {
+            flex-direction: column;
+        }
+
+        .filters select {
+            width: 100%;
+        }
+    }
+</style>
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+
+<div class="header">
+    <h2>Question Papers</h2>
+
+    <button class="back-btn" onclick="goBack()">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Dashboard
+    </button>
+</div>
+
+
+<div class="container">
+
+    <div class="intro">
+        <h1>Previous Question Papers</h1>
+
+        <p>
+            Access previous university and semester examination
+            question papers for exam preparation.
+        </p>
+    </div>
+
+    <div class="filters">
+
+        <select id="semesterFilter" onchange="filterPapers()">
+            <option value="ALL">All Semesters</option>
+        </select>
+
+        <select id="subjectFilter" onchange="filterPapers()">
+            <option value="ALL">All Subjects</option>
+        </select>
+
+        <select id="yearFilter" onchange="filterPapers()">
+            <option value="ALL">All Years</option>
+        </select>
+
+    </div>
+
+    <div id="papersContainer" class="papers-container">
+        <p>Loading question papers...</p>
+    </div>
+
+</div>
+
+
+<script src="js/question-papers.js"></script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,201 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="images/icon-512.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student - Subjects</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            color: #222;
+        }
+
+        header {
+            background: #1e3a8a;
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 25px;
+        }
+
+        .back-button {
+            background: white;
+            color: #1e3a8a;
+            border: none;
+            padding: 11px 18px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 30px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            overflow-x: auto;
+        }
+
+        
+.filter-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.filter-section label {
+    color: #1e3a8a;
+    font-weight: bold;
+}
+
+.filter-section select {
+    padding: 10px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: white;
+    color: #1e3a8a;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+
+        h2 {
+            color: #1e3a8a;
+            margin-top: 0;
+        }
+
+        .message {
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        .error {
+            color: #dc2626;
+        }
+
+        .no-data {
+            color: #555;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        th {
+            background: #1e3a8a;
+            color: white;
+            padding: 13px;
+            text-align: left;
+        }
+
+        td {
+            padding: 13px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tbody tr:hover {
+            background: #f1f5f9;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            header h1 {
+                font-size: 21px;
+            }
+
+            .container {
+                margin: 18px auto;
+            }
+
+            .card {
+                padding: 18px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    </head>
+<body>
+
+<header>
+    <h1><i class="fa-solid fa-book-open" aria-hidden="true"></i> Student - Subjects</h1>
+
+    <button class="back-button" onclick="goBack()">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Dashboard
+    </button>
+</header>
+
+<main class="container">
+    
+<section class="card">
+    <h2>Available Subjects</h2>
+
+    <!-- Semester Filter: ADD THIS -->
+    <div class="filter-section">
+        <label for="semesterFilter">Filter by Semester:</label>
+
+        <select id="semesterFilter">
+            <option value="all">All Semesters</option>
+            <option value="1">Semester 1</option>
+            <option value="2">Semester 2</option>
+            <option value="3">Semester 3</option>
+            <option value="4">Semester 4</option>
+            <option value="5">Semester 5</option>
+            <option value="6">Semester 6</option>
+        </select>
+    </div>
+
+    <div id="message" class="message">
+        Loading subjects...
+    </div>
+
+    <table id="subjectsTable" hidden>
+        <thead>
+            <tr>
+                <th>Subject ID</th>
+                <th>Subject Name</th>
+                <th>Subject Code</th>
+                <th>Semester</th>
+                <th>Faculty Name</th>
+            </tr>
+        </thead>
+
+        <tbody id="subjectsBody"></tbody>
+    </table>
+</section>
+
+</main>
+
+<script src="js/student-subjects.js"></script>
+
+</body>
+</html>

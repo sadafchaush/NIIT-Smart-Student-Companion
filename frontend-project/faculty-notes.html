@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="images/icon-512.png">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Faculty - Manage Notes</title>
+
+<style>
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f4f6f9;
+    }
+
+    header {
+        background: #1e3a8a;
+        color: white;
+        padding: 20px;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    header h2 {
+        margin: 0;
+    }
+
+    .back-button {
+        background: white;
+        color: #1e3a8a;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .back-button:hover {
+        background: #e5e7eb;
+    }
+
+    .container {
+        padding: 30px;
+    }
+
+    .card {
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+
+        box-shadow:
+            0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    h3 {
+        color: #1e3a8a;
+    }
+
+    label {
+        display: block;
+        margin-top: 15px;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    input,
+    textarea,
+    select {
+
+        width: 100%;
+        padding: 10px;
+
+        border: 1px solid #ccc;
+        border-radius: 5px;
+
+        box-sizing: border-box;
+    }
+
+    input[type="file"] {
+        background: white;
+        cursor: pointer;
+    }
+
+    textarea {
+        height: 100px;
+        resize: vertical;
+    }
+
+    .save-button {
+
+        margin-top: 20px;
+
+        background: #1e3a8a;
+        color: white;
+
+        border: none;
+
+        padding: 12px 25px;
+
+        border-radius: 5px;
+
+        cursor: pointer;
+    }
+
+    .save-button:hover {
+        background: #172554;
+    }
+
+    .message {
+        margin-top: 15px;
+        font-weight: bold;
+    }
+
+    .notes-grid {
+
+        display: grid;
+
+        grid-template-columns:
+            repeat(auto-fit, minmax(250px, 1fr));
+
+        gap: 20px;
+    }
+
+    .note-card {
+
+        background: #f8fafc;
+
+        padding: 20px;
+
+        border-radius: 10px;
+
+        border-left: 5px solid #1e3a8a;
+    }
+
+    .note-card h4 {
+        color: #1e3a8a;
+        margin-top: 0;
+    }
+
+    .note-card p {
+        margin: 8px 0;
+    }
+
+    .error {
+        color: red;
+    }
+
+</style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    </head>
+<body>
+
+<header>
+
+    <h2><i class="fa-solid fa-book-open" aria-hidden="true"></i> Faculty - Manage Notes</h2>
+
+    <button
+        class="back-button"
+        onclick="goBack()">
+
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Dashboard
+
+    </button>
+
+</header>
+
+
+<div class="container">
+
+
+<!-- =====================================================
+     ADD / EDIT NOTE
+     ===================================================== -->
+
+<div class="card">
+
+    <h3><i class="fa-solid fa-circle-plus" aria-hidden="true"></i> Add New Note</h3>
+
+    <form id="noteForm">
+
+
+        <label for="title">
+            Note Title
+        </label>
+
+        <input
+            type="text"
+            id="title"
+            placeholder="Enter note title"
+            required
+        >
+
+
+        <label for="description">
+            Description
+        </label>
+
+        <textarea
+            id="description"
+            placeholder="Enter note description"
+            required
+        ></textarea>
+
+
+        <label for="file">
+            Select File
+        </label>
+
+        <input
+            type="file"
+            id="file"
+            accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.xls,.xlsx"
+            required
+        >
+
+        <small>
+            Select a PDF or other study material from your computer.
+        </small>
+
+
+        <label for="className">
+    Select Class
+</label>
+
+<select id="className" required>
+
+    <option value="">
+        Select Class
+    </option>
+
+    <option value="B.Sc Computer Science - 1st Year">
+        B.Sc Computer Science - 1st Year
+    </option>
+
+    <option value="B.Sc Computer Science - 2nd Year">
+        B.Sc Computer Science - 2nd Year
+    </option>
+
+    <option value="B.Sc Computer Science - 3rd Year">
+        B.Sc Computer Science - 3rd Year
+    </option>
+
+</select>
+
+
+<label for="semester">
+    Select Semester
+</label>
+
+<select id="semester" required>
+
+    <option value="">
+        Select Semester
+    </option>
+
+    <option value="1">Semester 1</option>
+    <option value="2">Semester 2</option>
+    <option value="3">Semester 3</option>
+    <option value="4">Semester 4</option>
+    <option value="5">Semester 5</option>
+    <option value="6">Semester 6</option>
+
+</select>
+
+
+<label for="subjectId">
+    Select Subject
+</label>
+
+<select
+    id="subjectId"
+    required>
+
+    <option value="">
+        Loading subjects...
+    </option>
+
+</select>
+        <button
+            type="button"
+            id="saveNoteBtn"
+            class="save-button">
+
+            Upload Note
+
+        </button>
+
+
+        <div
+            id="message"
+            class="message">
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<!-- =====================================================
+     ALL NOTES
+     ===================================================== -->
+
+<div class="card">
+
+    <h3><i class="fa-solid fa-book-open" aria-hidden="true"></i> All Notes</h3>
+
+    <div
+        id="notesContainer"
+        class="notes-grid">
+
+        <p>
+            Loading notes...
+        </p>
+
+    </div>
+
+</div>
+
+
+</div>
+
+
+<script src="js/faculty-notes.js"></script>
+
+
+<script>
+
+    function goBack() {
+
+        window.location.href =
+            "faculty-dashboard.html";
+    }
+
+</script>
+
+</body>
+
+</html>

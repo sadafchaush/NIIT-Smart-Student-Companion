@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="images/icon-512.png">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>My Attendance - NIIT Smart Student Companion</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            min-height: 100vh;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        header {
+            background: #1e3a8a;
+            color: white;
+
+            padding: 20px 35px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h2 {
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* =========================
+           BACK BUTTON
+        ========================= */
+
+        .back-btn {
+            background: white;
+            color: #1e3a8a;
+
+            border: none;
+            border-radius: 7px;
+
+            padding: 10px 18px;
+
+            font-size: 14px;
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            background: #e5e7eb;
+        }
+
+        /* =========================
+           CONTAINER
+        ========================= */
+
+        .container {
+            width: 90%;
+            max-width: 850px;
+
+            margin: 40px auto;
+        }
+
+        /* =========================
+           CARD
+        ========================= */
+
+        .attendance-card {
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 4px 15px rgba(0, 0, 0, 0.10);
+        }
+
+        .attendance-card h1 {
+            text-align: center;
+
+            color: #1e3a8a;
+
+            margin-bottom: 8px;
+        }
+
+        .description {
+            text-align: center;
+
+            color: #666;
+
+            margin-bottom: 30px;
+        }
+
+        /* =========================
+           TABLE
+        ========================= */
+
+        table {
+            width: 100%;
+
+            border-collapse: collapse;
+
+            background: white;
+        }
+
+        th {
+            background: #1e3a8a;
+
+            color: white;
+
+            padding: 15px;
+
+            text-align: center;
+        }
+
+        td {
+            padding: 15px;
+
+            text-align: center;
+
+            border-bottom: 1px solid #ddd;
+
+            color: #333;
+        }
+
+        tbody tr:hover {
+            background: #f5f7fb;
+        }
+
+        /* =========================
+           LOADING / ERROR
+        ========================= */
+
+        .loading {
+            color: #666;
+        }
+
+        .error {
+            color: #b91c1c;
+
+            font-weight: bold;
+        }
+
+        .success {
+            color: #166534;
+        }
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 600px) {
+
+            header {
+                padding: 18px;
+
+                flex-direction: column;
+
+                gap: 15px;
+
+                text-align: center;
+            }
+
+            .container {
+                width: 95%;
+
+                margin: 25px auto;
+            }
+
+            .attendance-card {
+                padding: 20px;
+            }
+
+            th,
+            td {
+                padding: 10px;
+
+                font-size: 14px;
+            }
+
+        }
+
+    </style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    </head>
+<body>
+
+    <!-- =========================
+         HEADER
+    ========================== -->
+
+    <header>
+
+        <div>
+
+            <h2><i class="fa-solid fa-chart-column" aria-hidden="true"></i> My Attendance</h2>
+
+            <p>
+                NIIT Smart Student Companion
+            </p>
+
+        </div>
+
+        <button
+            type="button"
+            class="back-btn"
+            onclick="goBack()">
+
+            <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Dashboard
+
+        </button>
+
+    </header>
+
+
+    <!-- =========================
+         MAIN
+    ========================== -->
+
+    <div class="container">
+
+        <div class="attendance-card">
+
+            <h1>
+                Attendance Report
+            </h1>
+
+            <p class="description">
+                View your subject-wise attendance.
+            </p>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Subject
+                        </th>
+
+                        <th>
+                            Attendance
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="attendanceTableBody">
+
+                    <tr>
+
+                        <td colspan="2">
+                            Loading attendance...
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <script src="js/attendance.js"></script>
+
+</body>
+
+</html>

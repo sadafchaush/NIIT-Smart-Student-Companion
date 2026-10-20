@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="images/icon-512.png">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Student Dashboard</title>
+
+    <!-- Professional Icons -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+
+        /* =========================================
+           BASIC RESET
+        ========================================= */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            color: #111;
+        }
+
+
+        /* =========================================
+           HEADER
+        ========================================= */
+
+        .header {
+            background: #1e3a8a;
+            color: white;
+            padding: 18px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 80px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .header-icon {
+            font-size: 34px;
+        }
+
+        .header-title {
+            margin: 0;
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .header-subtitle {
+            margin: 5px 0 0;
+            font-size: 17px;
+            opacity: 0.95;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 17px;
+            font-weight: bold;
+        }
+
+        .profile-icon {
+            font-size: 21px;
+        }
+
+
+        /* =========================================
+           LOGOUT BUTTON
+        ========================================= */
+
+        .logout-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 11px 20px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: #b91c1c;
+        }
+
+
+        /* =========================================
+           DASHBOARD CONTAINER
+        ========================================= */
+
+        .dashboard-container {
+            width: 100%;
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+
+        /* =========================================
+           WELCOME SECTION
+        ========================================= */
+
+        .welcome-section {
+            margin-bottom: 25px;
+        }
+
+        .welcome-section h2 {
+            margin: 0 0 8px;
+            color: #1e3a8a;
+            font-size: 28px;
+        }
+
+        .welcome-section p {
+            margin: 0;
+            font-size: 17px;
+            color: #555;
+        }
+
+
+        /* =========================================
+           DASHBOARD GRID
+        ========================================= */
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 24px;
+            align-items: stretch;
+        }
+
+
+        /* =========================================
+           DASHBOARD CARD
+        ========================================= */
+
+        .dashboard-card {
+            background: white;
+            width: 100%;
+            height: 285px;
+            min-height: 285px;
+            padding: 24px 20px;
+            border-radius: 12px;
+
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.08);
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+
+            text-align: center;
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-3px);
+
+            box-shadow:
+                0 7px 18px rgba(0, 0, 0, 0.12);
+        }
+
+
+        /* =========================================
+           CARD ICON
+        ========================================= */
+
+        .card-icon {
+            width: 62px;
+            height: 62px;
+
+            border-radius: 50%;
+
+            background: #eff6ff;
+            color: #1e3a8a;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 27px;
+
+            flex-shrink: 0;
+        }
+
+
+        /* =========================================
+           CARD TITLE
+        ========================================= */
+
+        .dashboard-card h3 {
+            width: 100%;
+            height: 34px;
+
+            margin: 0;
+
+            color: #1e3a8a;
+
+            font-size: 23px;
+            font-weight: 700;
+
+            line-height: 34px;
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+
+        /* =========================================
+           CARD DESCRIPTION
+        ========================================= */
+
+        .dashboard-card p {
+            width: 100%;
+            height: 52px;
+
+            margin: 0;
+
+            color: #444;
+
+            font-size: 16px;
+            line-height: 1.45;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        /* =========================================
+           CARD BUTTON
+        ========================================= */
+
+        .card-button {
+            width: 175px;
+            height: 48px;
+
+            background: #1e3a8a;
+            color: white;
+
+            border: none;
+            border-radius: 6px;
+
+            font-size: 15px;
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: background 0.2s ease;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 8px;
+
+            flex-shrink: 0;
+        }
+
+        .card-button:hover {
+            background: #172f70;
+        }
+
+        .arrow {
+            font-size: 14px;
+        }
+
+
+        /* =========================================
+           TABLET / SMALL DESKTOP
+        ========================================= */
+
+        @media (max-width: 1200px) {
+
+            .dashboard-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 22px;
+            }
+
+        }
+
+
+        /* =========================================
+           TABLET
+        ========================================= */
+
+        @media (max-width: 850px) {
+
+            .header {
+                padding: 15px 20px;
+            }
+
+            .header-title {
+                font-size: 22px;
+            }
+
+            .header-subtitle {
+                font-size: 15px;
+            }
+
+            .header-right {
+                gap: 10px;
+            }
+
+            .dashboard-container {
+                padding: 20px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 20px;
+            }
+
+        }
+
+
+        /* =========================================
+           MOBILE
+        ========================================= */
+
+        @media (max-width: 600px) {
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+                padding: 18px;
+            }
+
+            .header-left {
+                width: 100%;
+            }
+
+            .header-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .header-title {
+                font-size: 21px;
+            }
+
+            .dashboard-container {
+                padding: 15px;
+            }
+
+            .welcome-section h2 {
+                font-size: 24px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+
+            .dashboard-card {
+                height: 285px;
+                min-height: 285px;
+            }
+
+        }
+
+
+        /* =========================================
+           VERY SMALL MOBILE
+        ========================================= */
+
+        @media (max-width: 400px) {
+
+            .header-left {
+                gap: 10px;
+            }
+
+            .header-icon {
+                font-size: 28px;
+            }
+
+            .header-title {
+                font-size: 18px;
+            }
+
+            .header-subtitle {
+                font-size: 14px;
+            }
+
+            .student-info {
+                font-size: 14px;
+            }
+
+            .logout-btn {
+                padding: 9px 14px;
+                font-size: 14px;
+            }
+
+            .dashboard-card h3 {
+                font-size: 21px;
+            }
+
+            .dashboard-card p {
+                font-size: 15px;
+            }
+
+            .card-button {
+                width: 165px;
+                height: 46px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================================
+         HEADER
+    ========================================= -->
+
+    <header class="header">
+
+        <!-- LEFT -->
+
+        <div class="header-left">
+
+            <div class="header-icon">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+
+            <div>
+
+                <h1 class="header-title">
+                    NIIT Smart Student Companion
+                </h1>
+
+                <p class="header-subtitle">
+                    Student Dashboard
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- RIGHT -->
+
+        <div class="header-right">
+
+            <div class="student-info">
+
+                <span class="profile-icon">
+                    <i class="fa-solid fa-user"></i>
+                </span>
+
+                <span id="studentName">
+                    Student
+                </span>
+
+            </div>
+
+
+            <button
+                class="logout-btn"
+                onclick="logout()">
+
+                Logout
+
+            </button>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =========================================
+         MAIN DASHBOARD
+    ========================================= -->
+
+    <main class="dashboard-container">
+
+
+        <!-- WELCOME -->
+
+        <div class="welcome-section">
+
+            <h2 id="welcomeMessage">
+                Welcome, Student!
+            </h2>
+
+            <p>
+                Access your academic resources and manage your studies.
+            </p>
+
+        </div>
+
+
+
+        <!-- =========================================
+             DASHBOARD CARDS
+        ========================================= -->
+
+        <div class="dashboard-grid">
+
+
+            <!-- NOTES -->
+
+            <div class="dashboard-card">
+
+                <div class="card-icon">
+                    <i class="fa-solid fa-book-open"></i>
+                </div>
+
+                <h3>
+                    Notes
+                </h3>
+
+                <p>
+                    View and download your study notes.
+                </p>
+
+                <button
+                    class="card-button"
+                    onclick="window.location.href='notes.html'">
+
+                    View Notes
+
+                    <span class="arrow">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </span>
+
+                </button>
+
+            </div>
+
+
+
+            <!-- ASSIGNMENTS -->
+
+            <div class="dashboard-card">
+
+                <div class="card-icon">
+                    <i class="fa-solid fa-file-pen"></i>
+                </div>
+
+                <h3>
+                    Assignments
+                </h3>
+
+                <p>
+                    View and submit your assignments.
+                </p>
+
+                <button
+                    class="card-button"
+                    onclick="window.location.href='assignment.html'">
+
+                    View Assignments
+
+                    <span class="arrow">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </span>
+
+                </button>
+
+            </div>
+
+
+
+            <!-- ATTENDANCE -->
+
+            <div class="dashboard-card">
+
+                <div class="card-icon">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </div>
+
+                <h3>
+                    Attendance
+                </h3>
+
+                <p>
+                    Check your attendance.
+                </p>
+
+                <button
+                    class="card-button"
+                    onclick="window.location.href='attendance.html'">
+
+                    View Attendance
+
+                    <span class="arrow">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <!-- MESSAGES -->
+
+            <div class="dashboard-card">
+
+                <div class="card-icon">
+                    <i class="fa-solid fa-comments"></i>
+                </div>
+
+                <h3>
+                    Messages
+                </h3>
+
+                <p>
+                    Chat directly with your faculty.
+                </p>
+
+                <button
+                    class="card-button"
+                    onclick="window.location.href='messages.html'">
+
+                    Open Messages
+
+                    <span class="arrow">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <!-- ANNOUNCEMENTS -->
+
+            <div class="dashboard-card">
+
+                <div class="card-icon">
+                    <i class="fa-solid fa-bullhorn"></i>
+                </div>
+
+                <h3>
+                    Announcements
+                </h3>
+
+                <p>
+                    View latest announcements.
+                </p>
+
+                <button
+                    class="card-button"
+                    onclick="window.location.href='announcement.html'">
+
+                    View Announcements
+
+                    <span class="arrow">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </span>
+
+                </button>
+
+            </div>
+
+
+
+            
+<!-- SUBJECTS -->
+<div class="dashboard-card">
+
+    <div class="card-icon">
+        <i class="fa-solid fa-book"></i>
+    </div>
+
+    <h3>Subjects</h3>
+
+    <p>View your subjects.</p>
+
+    <button
+        class="card-button"
+        onclick="window.location.href='student-subjects.html'">
+
+        View Subjects
+
+        <span class="arrow">
+            <i class="fa-solid fa-arrow-right"></i>
+        </span>
+
+    </button>
+
+</div>
+
+
+
+            <!-- SYLLABUS -->
+
+            <div class="dashboard-card">
+
+                <div class="card-icon">
+                    <i class="fa-solid fa-list-check"></i>
+                </div>
+
+                <h3>
+                    Syllabus
+                </h3>
+
+                <p>
+                    View your syllabus.
+                </p>
+
+                <button
+                    class="card-button"
+                    onclick="window.location.href='syllabus.html'">
+
+                    View Syllabus
+
+                    <span class="arrow">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </span>
+
+                </button>
+
+            </div>
+
+
+
+            <!-- PROFILE -->
+
+            <div class="dashboard-card">
+
+                <div class="card-icon">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
+                <h3>
+                    Profile
+                </h3>
+
+                <p>
+                    View your profile information.
+                </p>
+
+                <button
+                    class="card-button"
+                    onclick="window.location.href='profile.html'">
+
+                    View Profile
+
+                    <span class="arrow">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </span>
+
+                </button>
+
+            </div>
+
+
+
+            <!-- GPA CALCULATOR -->
+
+            <div class="dashboard-card">
+
+                <div class="card-icon">
+                    <i class="fa-solid fa-calculator"></i>
+                </div>
+
+                <h3>
+                    GPA Calculator
+                </h3>
+
+                <p>
+                    Calculate your semester GPA.
+                </p>
+
+                <button
+                    class="card-button"
+                    onclick="window.location.href='gpa-calculator.html'">
+
+                    Open Calculator
+
+                    <span class="arrow">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </span>
+
+                </button>
+
+            </div>
+
+
+
+            <!-- QUESTION PAPERS -->
+
+            <div class="dashboard-card">
+
+                <div class="card-icon">
+                    <i class="fa-solid fa-file-pdf"></i>
+                </div>
+
+                <h3>
+                    Question Papers
+                </h3>
+
+                <p>
+                    View previous semester and university question papers.
+                </p>
+
+                <button
+                    class="card-button"
+                    onclick="window.location.href='question-papers.html'">
+
+                    View Question Papers
+
+                    <span class="arrow">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </span>
+
+                </button>
+
+            </div>
+
+
+        </div>
+
+    </main>
+
+
+
+    <!-- =========================================
+         JAVASCRIPT
+    ========================================= -->
+
+    <!-- COMMON AUTHENTICATION -->
+
+    <script src="js/auth.js"></script>
+
+
+    <script>
+
+        console.log("Student Dashboard loaded");
+
+
+        /* =========================================
+           STUDENT ROLE ACCESS CONTROL
+        ========================================= */
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // Allow only STUDENT users
+
+            if (!requireRole("STUDENT")) {
+                return;
+            }
+
+
+            /* =========================================
+               GET LOGGED-IN USER
+            ========================================= */
+
+            const loggedInUser = getLoggedInUser();
+
+            console.log(
+                "Logged-in user:",
+                loggedInUser
+            );
+
+
+            /* =========================================
+               DISPLAY STUDENT NAME
+            ========================================= */
+
+            if (loggedInUser) {
+
+                const name =
+                    loggedInUser.name ||
+                    loggedInUser.full_name ||
+                    loggedInUser.fullName ||
+                    "Student";
+
+
+                const studentName =
+                    document.getElementById("studentName");
+
+
+                if (studentName) {
+
+                    studentName.textContent = name;
+
+                }
+
+
+                const welcomeMessage =
+                    document.getElementById("welcomeMessage");
+
+
+                if (welcomeMessage) {
+
+                    welcomeMessage.textContent =
+                        "Welcome, " + name + "!";
+
+                }
+
+            }
+
+
+            console.log(
+                "Student dashboard access granted."
+            );
+
+        });
+
+    </script>
+
+
+</body>
+
+</html>

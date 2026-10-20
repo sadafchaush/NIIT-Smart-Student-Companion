@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="images/icon-512.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - NIIT Smart Student Companion</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="css/messages.css">
+</head>
+<body>
+    <header class="messages-header">
+        <a class="back-link" href="#" id="dashboardLink">
+            <i class="fa-solid fa-arrow-left"></i>
+            Dashboard
+        </a>
+        <div>
+            <h1><i class="fa-solid fa-comments"></i> Messages</h1>
+            <p>Private conversations between students and faculty</p>
+            <p id="messageNotification" class="message-notification"
+               role="status" aria-live="polite" hidden>
+                <i class="fa-solid fa-bell" aria-hidden="true"></i>
+                <span id="unreadMessageCount"></span>
+            </p>
+        </div>
+        <button type="button" class="logout-button" onclick="logout()">
+            Log out
+        </button>
+    </header>
+
+    <main class="messages-layout">
+        <aside class="contacts-panel">
+            <label for="contactSelect">Choose a conversation</label>
+            <select id="contactSelect" disabled>
+                <option value="">Loading contacts...</option>
+            </select>
+            <p id="contactHint" class="muted">
+                Select a student or faculty member to view your conversation.
+            </p>
+        </aside>
+
+        <section class="conversation-panel" aria-label="Conversation">
+            <div id="conversationHeader" class="conversation-header">
+                <h2>Select a contact</h2>
+                <button type="button" id="refreshButton" class="refresh-button"
+                        aria-label="Refresh conversation" disabled>
+                    <i class="fa-solid fa-rotate"></i>
+                </button>
+            </div>
+            <p id="statusMessage" class="status-message" role="status"></p>
+            <div id="messageList" class="message-list" aria-live="polite">
+                <p class="empty-state">Choose a contact to start chatting.</p>
+            </div>
+            <form id="messageForm" class="message-form">
+                <label class="visually-hidden" for="messageInput">Message</label>
+                <textarea id="messageInput" maxlength="2000"
+                          placeholder="Write a message..." required disabled></textarea>
+                <button id="sendButton" type="submit" disabled>
+                    Send <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </form>
+        </section>
+    </main>
+
+    <script src="js/auth.js"></script>
+    <script src="js/messages.js"></script>
+</body>
+</html>

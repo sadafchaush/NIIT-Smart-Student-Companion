@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="images/icon-512.png">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>My Profile</title>
+
+
+<style>
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f4f6f9;
+    }
+
+    header {
+        background: #1e3a8a;
+        color: white;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    header h2 {
+        margin: 0;
+    }
+
+    .back-btn {
+        background: white;
+        color: #1e3a8a;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .container {
+        padding: 30px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .profile-card {
+        background: white;
+        width: 500px;
+        max-width: 90%;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .profile-card h2 {
+        color: #1e3a8a;
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .profile-item {
+        padding: 15px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .profile-item strong {
+        display: inline-block;
+        width: 120px;
+        color: #1e3a8a;
+    }
+
+    .error {
+        color: red;
+        text-align: center;
+    }
+
+</style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    </head>
+<body>
+
+<header>
+
+<h2><i class="fa-solid fa-circle-user" aria-hidden="true"></i> My Profile</h2>
+
+<button
+    class="back-btn"
+    onclick="goBack()">
+
+    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Dashboard
+
+</button>
+
+</header>
+
+<div class="container">
+
+<div class="profile-card">
+
+    <h2>Student Profile</h2>
+
+    <div class="profile-item">
+
+        <strong>Name:</strong>
+
+        <span id="studentName">
+            Loading...
+        </span>
+
+    </div>
+
+
+    <div class="profile-item">
+
+        <strong>Email:</strong>
+
+        <span id="studentEmail">
+            Loading...
+        </span>
+
+    </div>
+
+
+    <div class="profile-item">
+
+        <strong>Mobile:</strong>
+
+        <span id="studentMobile">
+            Loading...
+        </span>
+
+    </div>
+
+
+    <div class="profile-item">
+
+        <strong>Course:</strong>
+
+        <span id="studentCourse">
+            Loading...
+        </span>
+
+    </div>
+
+</div>
+
+</div>
+
+<script src="js/profile.js"></script>
+
+</body>
+
+</html>
