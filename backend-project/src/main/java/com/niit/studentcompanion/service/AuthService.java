@@ -4,6 +4,8 @@ package com.niit.studentcompanion.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.niit.studentcompanion.entity.User;
 import com.niit.studentcompanion.repository.UserRepository;
@@ -29,9 +31,8 @@ public class AuthService {
         // -----------------------------------------
 
         if (email == null || email.trim().isEmpty()) {
-            throw new RuntimeException(
-                    "Email is required"
-            );
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Email is required");
         }
 
 
@@ -40,9 +41,8 @@ public class AuthService {
         // -----------------------------------------
 
         if (password == null || password.isEmpty()) {
-            throw new RuntimeException(
-                    "Password is required"
-            );
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Password is required");
         }
 
 
@@ -62,9 +62,9 @@ public class AuthService {
                 userRepository
                         .findByEmail(normalizedEmail)
                         .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Invalid email or password"
-                                )
+                                new ResponseStatusException(
+                                        HttpStatus.UNAUTHORIZED,
+                                        "Invalid email or password")
                         );
 
 
@@ -81,9 +81,8 @@ public class AuthService {
 
         if (!passwordMatches) {
 
-            throw new RuntimeException(
-                    "Invalid email or password"
-            );
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED, "Invalid email or password");
         }
 
 
@@ -94,9 +93,8 @@ public class AuthService {
         if (user.getRole() == null ||
                 user.getRole().trim().isEmpty()) {
 
-            throw new RuntimeException(
-                    "User role is not configured"
-            );
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, "User role is not configured");
         }
 
 
@@ -114,4 +112,3 @@ public class AuthService {
         return user;
     }
 }
-

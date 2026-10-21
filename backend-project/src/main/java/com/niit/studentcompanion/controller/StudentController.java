@@ -7,16 +7,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.web.bind.annotation.*;
 
 import com.niit.studentcompanion.entity.Student;
 import com.niit.studentcompanion.entity.User;
 import com.niit.studentcompanion.repository.StudentRepository;
 import com.niit.studentcompanion.repository.UserRepository;
+import com.niit.studentcompanion.repository.AttendanceRepository;
+import com.niit.studentcompanion.repository.SubmissionRepository;
+import com.niit.studentcompanion.repository.DirectMessageRepository;
+import com.niit.studentcompanion.dto.StudentResponse;
+import com.niit.studentcompanion.repository.FacultyRepository;
+import com.niit.studentcompanion.repository.SubjectRepository;
 
 @RestController
 @RequestMapping("/students")
-@CrossOrigin(origins = "*")
 public class StudentController {
 
     @Autowired
@@ -28,16 +37,53 @@ public class StudentController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private AttendanceRepository attendanceRepository;
+
+    @Autowired
+    private SubmissionRepository submissionRepository;
+
+    @Autowired
+    private DirectMessageRepository directMessageRepository;
+
+    @Autowired
+    private FacultyRepository facultyRepository;
+
+    @Autowired
+    private SubjectRepository subjectRepository;
 
     // =====================================================
     // GET ALL STUDENTS
     // =====================================================
 
     @GetMapping
-    public ResponseEntity<List<Student>> getAllStudents() {
+    public ResponseEntity<List<StudentResponse>> getAllStudents(
+            Authentication authentication) {
+        List<Student> students;
+        if (AuthorityUtils.authorityListToSet(authentication.getAuthorities())
+                .contains("ROLE_ADMIN")) {
+            students = studentRepository.findAll();
+        } else {
+            Integer facultyId = facultyRepository
+                    .findByEmailIgnoreCase(authentication.getName())
+                    .map(faculty -> faculty.getFacultyId())
+                    .orElse(null);
+            List<Integer> semesters = facultyId == null
+                    ? List.of()
+                    : subjectRepository.findByFacultyFacultyId(facultyId).stream()
+                            .map(subject -> subject.getSemester())
+                            .filter(java.util.Objects::nonNull)
+                            .distinct()
+                            .toList();
+            students = semesters.isEmpty()
+                    ? List.of()
+                    : studentRepository.findBySemesterIn(semesters);
+        }
 
         return ResponseEntity.ok(
-                studentRepository.findAll()
+                students.stream()
+                        .map(StudentResponse::from)
+                        .toList()
         );
     }
 
@@ -47,11 +93,12 @@ public class StudentController {
     // =====================================================
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @accountAccess.canViewStudentId(#p0, authentication)")
     public ResponseEntity<?> getStudentById(
             @PathVariable Long id) {
 
         return studentRepository.findById(id)
-                .map(student -> ResponseEntity.ok(student))
+                .map(student -> ResponseEntity.ok(StudentResponse.from(student)))
                 .orElseGet(() ->
                         ResponseEntity
                                 .status(HttpStatus.NOT_FOUND)
@@ -65,12 +112,13 @@ public class StudentController {
     // =====================================================
 
     @GetMapping("/email/{email}")
+    @PreAuthorize("hasRole('ADMIN') or @accountAccess.canViewStudentEmail(#p0, authentication)")
     public ResponseEntity<?> getStudentByEmail(
             @PathVariable String email) {
 
         return studentRepository
                 .findByEmail(email)
-                .map(student -> ResponseEntity.ok(student))
+                .map(student -> ResponseEntity.ok(StudentResponse.from(student)))
                 .orElseGet(() ->
                         ResponseEntity
                                 .status(HttpStatus.NOT_FOUND)
@@ -88,6 +136,7 @@ public class StudentController {
     // =====================================================
 
     @PostMapping
+    @Transactional
     public ResponseEntity<?> addStudent(
             @RequestBody Student student) {
 
@@ -123,6 +172,12 @@ public class StudentController {
                     .toLowerCase();
 
             student.setEmail(email);
+
+            if (student.getMobile() == null
+                    || !student.getMobile().matches("\\d{10}")) {
+                return ResponseEntity.badRequest()
+                        .body("Mobile number must contain exactly 10 digits");
+            }
 
 
             // -----------------------------------------
@@ -162,6 +217,10 @@ public class StudentController {
                         );
             }
 
+            if (studentRepository.existsByMobile(student.getMobile())) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body("Mobile number is already registered");
+            }
 
             // -----------------------------------------
             // Check Login Email
@@ -181,6 +240,8 @@ public class StudentController {
             // Save Student
             // -----------------------------------------
 
+            String rawPassword = student.getPassword();
+            student.setPassword(passwordEncoder.encode(rawPassword));
             Student savedStudent =
                     studentRepository.save(student);
 
@@ -199,7 +260,7 @@ public class StudentController {
 
             user.setPassword(
                     passwordEncoder.encode(
-                            student.getPassword()
+                            rawPassword
                     )
             );
 
@@ -219,15 +280,16 @@ public class StudentController {
 
             return ResponseEntity
                     .status(HttpStatus.CREATED)
-                    .body(savedStudent);
+                    .body(StudentResponse.from(savedStudent));
 
         } catch (Exception e) {
 
+            org.springframework.transaction.interceptor.TransactionAspectSupport
+                    .currentTransactionStatus().setRollbackOnly();
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(
-                            "Error while adding student: "
-                            + e.getMessage()
+                            "Error while adding student"
                     );
         }
     }
@@ -242,6 +304,8 @@ public class StudentController {
     // =====================================================
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
     public ResponseEntity<?> updateStudent(
             @PathVariable Long id,
             @RequestBody Student studentDetails) {
@@ -298,6 +362,17 @@ public class StudentController {
                     studentDetails.getEmail()
                             .trim()
                             .toLowerCase();
+
+            if (studentDetails.getMobile() == null
+                    || !studentDetails.getMobile().matches("\\d{10}")) {
+                return ResponseEntity.badRequest()
+                        .body("Mobile number must contain exactly 10 digits");
+            }
+            if (studentRepository.existsByMobileAndStudentIdNot(
+                    studentDetails.getMobile(), id)) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body("Mobile number is already registered");
+            }
 
 
             // -----------------------------------------
@@ -373,7 +448,7 @@ public class StudentController {
                             );
                 }
 
-                student.setPassword(newPassword);
+                student.setPassword(passwordEncoder.encode(newPassword));
             }
 
 
@@ -427,6 +502,8 @@ public class StudentController {
                 if (password == null ||
                         password.trim().isEmpty()) {
 
+                    org.springframework.transaction.interceptor.TransactionAspectSupport
+                            .currentTransactionStatus().setRollbackOnly();
                     return ResponseEntity
                             .badRequest()
                             .body(
@@ -434,9 +511,7 @@ public class StudentController {
                             );
                 }
 
-                user.setPassword(
-                        passwordEncoder.encode(password)
-                );
+                user.setPassword(password);
 
                 user.setRole("STUDENT");
 
@@ -476,17 +551,16 @@ public class StudentController {
             userRepository.save(user);
 
 
-            return ResponseEntity.ok(
-                    updatedStudent
-            );
+            return ResponseEntity.ok(StudentResponse.from(updatedStudent));
 
         } catch (Exception e) {
 
+            org.springframework.transaction.interceptor.TransactionAspectSupport
+                    .currentTransactionStatus().setRollbackOnly();
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(
-                            "Error while updating student: "
-                                    + e.getMessage()
+                            "Error while updating student"
                     );
         }
     }
@@ -501,6 +575,8 @@ public class StudentController {
     // =====================================================
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
     public ResponseEntity<?> deleteStudent(
             @PathVariable Long id) {
 
@@ -515,10 +591,27 @@ public class StudentController {
                                     )
                             );
 
+            var account = student.getEmail() == null
+                    ? java.util.Optional.<User>empty()
+                    : userRepository.findByEmail(
+                            student.getEmail().trim().toLowerCase());
+            if (attendanceRepository
+                    .existsByStudentStudentId(id)
+                    || submissionRepository.existsByStudentId(id)
+                    || account.filter(user -> directMessageRepository
+                            .existsBySender_IdOrRecipient_Id(
+                                    user.getId(), user.getId()))
+                            .isPresent()) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body("Student has attendance, submissions, or messages and cannot be deleted");
+            }
 
             // -----------------------------------------
-            // Delete Login User
+            // Delete student before its login account so foreign-key
+            // failures cannot leave an active account behind.
             // -----------------------------------------
+
+            studentRepository.delete(student);
 
             if (student.getEmail() != null) {
 
@@ -540,25 +633,20 @@ public class StudentController {
 
 
             // -----------------------------------------
-            // Delete Student
-            // -----------------------------------------
-
-            studentRepository.delete(student);
-
-
             return ResponseEntity.ok(
                     "Student deleted successfully"
             );
 
         } catch (Exception e) {
 
+            org.springframework.transaction.interceptor.TransactionAspectSupport
+                    .currentTransactionStatus().setRollbackOnly();
             return ResponseEntity
                     .status(
                             HttpStatus.INTERNAL_SERVER_ERROR
                     )
                     .body(
-                            "Error while deleting student: "
-                                    + e.getMessage()
+                            "Error while deleting student"
                     );
         }
     }

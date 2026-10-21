@@ -162,7 +162,7 @@ async function saveStudent() {
 
     const password =
         passwordElement ?
-        passwordElement.value.trim() :
+        passwordElement.value :
         "";
 
 
@@ -191,8 +191,6 @@ async function saveStudent() {
         studentData.password = password;
     }
 
-
-    console.log("Student data:", studentData);
 
 
     try {

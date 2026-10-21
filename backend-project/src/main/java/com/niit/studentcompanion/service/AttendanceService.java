@@ -26,6 +26,9 @@ public class AttendanceService {
     @Autowired
     private SubjectRepository subjectRepository;
 
+    @Autowired
+    private com.niit.studentcompanion.repository.FacultyRepository facultyRepository;
+
 
     // Add Attendance
     public Attendance addAttendance(Attendance attendance) {
@@ -65,7 +68,25 @@ public class AttendanceService {
             attendance.setSubject(subject);
         }
 
+        if (attendance.getStudent() == null || attendance.getSubject() == null
+                || attendance.getAttendanceDate() == null
+                || attendance.getStatus() == null
+                || attendance.getStatus().isBlank()) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST,
+                    "Student, subject, date, and status are required");
+        }
+        validateStudentSemester(attendance);
 
+        if (attendanceRepository
+                .existsByStudentStudentIdAndSubjectSubjectIdAndAttendanceDate(
+                        attendance.getStudent().getStudentId(),
+                        attendance.getSubject().getSubjectId(),
+                        attendance.getAttendanceDate())) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.CONFLICT,
+                    "Attendance is already recorded for this student, subject, and date");
+        }
         return attendanceRepository.save(attendance);
     }
 
@@ -74,6 +95,28 @@ public class AttendanceService {
     public List<Attendance> getAllAttendance() {
 
         return attendanceRepository.findAll();
+    }
+
+    public List<Attendance> getAttendanceByFaculty(String email) {
+        Integer facultyId = facultyRepository.findByEmailIgnoreCase(email)
+                .map(faculty -> faculty.getFacultyId())
+                .orElse(null);
+        return facultyId == null
+                ? List.of()
+                : attendanceRepository.findBySubjectFacultyFacultyId(facultyId);
+    }
+
+    public List<Attendance> getAttendanceByStudentAndFaculty(
+            Long studentId,
+            String email) {
+        Integer facultyId = facultyRepository.findByEmailIgnoreCase(email)
+                .map(faculty -> faculty.getFacultyId())
+                .orElse(null);
+        return facultyId == null
+                ? List.of()
+                : attendanceRepository
+                        .findByStudentStudentIdAndSubjectFacultyFacultyId(
+                                studentId, facultyId);
     }
 
 
@@ -153,8 +196,40 @@ public class AttendanceService {
             attendance.setSubject(subject);
         }
 
+        if (attendance.getStudent() == null
+                || attendance.getSubject() == null
+                || attendance.getAttendanceDate() == null
+                || attendance.getStatus() == null
+                || attendance.getStatus().isBlank()) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST,
+                    "Student, subject, date, and status are required");
+        }
+        validateStudentSemester(attendance);
+
+        if (attendanceRepository
+                .existsByStudentStudentIdAndSubjectSubjectIdAndAttendanceDateAndAttendanceIdNot(
+                        attendance.getStudent().getStudentId(),
+                        attendance.getSubject().getSubjectId(),
+                        attendance.getAttendanceDate(),
+                        id)) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.CONFLICT,
+                    "Attendance is already recorded for this student, subject, and date");
+        }
 
         return attendanceRepository.save(attendance);
+    }
+
+    private void validateStudentSemester(Attendance attendance) {
+        if (attendance.getSubject().getSemester() != null
+                && attendance.getStudent().getSemester() != null
+                && !attendance.getSubject().getSemester()
+                        .equals(attendance.getStudent().getSemester())) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST,
+                    "Student semester does not match the attendance subject");
+        }
     }
     
  // Get Attendance By Student ID

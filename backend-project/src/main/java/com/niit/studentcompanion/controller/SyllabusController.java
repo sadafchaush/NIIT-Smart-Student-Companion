@@ -5,22 +5,33 @@ import com.niit.studentcompanion.service.SyllabusService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
 
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import com.niit.studentcompanion.repository.StudentRepository;
+import com.niit.studentcompanion.repository.FacultyRepository;
+
 @RestController
 @RequestMapping("/syllabus")
-@CrossOrigin(origins = "*")
 public class SyllabusController {
 
     private final SyllabusService syllabusService;
+    private final StudentRepository studentRepository;
+    private final FacultyRepository facultyRepository;
 
     public SyllabusController(
-            SyllabusService syllabusService) {
+            SyllabusService syllabusService,
+            StudentRepository studentRepository,
+            FacultyRepository facultyRepository) {
 
         this.syllabusService = syllabusService;
+        this.studentRepository = studentRepository;
+        this.facultyRepository = facultyRepository;
     }
 
 
@@ -31,8 +42,26 @@ public class SyllabusController {
 
     @GetMapping
     public ResponseEntity<List<Syllabus>>
-    getAllSyllabus() {
-
+    getAllSyllabus(Authentication authentication) {
+        if (AuthorityUtils.authorityListToSet(authentication.getAuthorities())
+                .contains("ROLE_STUDENT")) {
+            Integer semester = studentRepository.findByEmail(authentication.getName())
+                    .map(student -> student.getSemester())
+                    .orElse(null);
+            return ResponseEntity.ok(semester == null
+                    ? List.of()
+                    : syllabusService.getSyllabusBySemester(semester));
+        }
+        if (AuthorityUtils.authorityListToSet(authentication.getAuthorities())
+                .contains("ROLE_FACULTY")) {
+            Integer facultyId = facultyRepository
+                    .findByEmailIgnoreCase(authentication.getName())
+                    .map(faculty -> faculty.getFacultyId())
+                    .orElse(null);
+            return ResponseEntity.ok(facultyId == null
+                    ? List.of()
+                    : syllabusService.getSyllabusByFaculty(facultyId));
+        }
         return ResponseEntity.ok(
                 syllabusService.getAllSyllabus()
         );
@@ -45,6 +74,7 @@ public class SyllabusController {
     // ==========================================
 
     @GetMapping("/{id}")
+    @PreAuthorize("@accountAccess.canAccessSyllabus(#p0, authentication)")
     public ResponseEntity<Syllabus>
     getSyllabusById(
             @PathVariable Long id) {
@@ -66,6 +96,7 @@ public class SyllabusController {
     // ==========================================
 
     @GetMapping("/subject/{subjectId}")
+    @PreAuthorize("@accountAccess.canAccessSubject(#p0, authentication)")
     public ResponseEntity<List<Syllabus>>
     getSyllabusBySubject(
             @PathVariable Long subjectId) {
@@ -83,6 +114,7 @@ public class SyllabusController {
     // ==========================================
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN') or @accountAccess.canManageSyllabus(#p0, authentication)")
     public ResponseEntity<Syllabus>
     createSyllabus(
             @RequestBody Syllabus syllabus) {
@@ -104,6 +136,7 @@ public class SyllabusController {
     // ==========================================
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @accountAccess.ownsSyllabus(#p0, authentication)")
     public ResponseEntity<Syllabus>
     updateSyllabus(
             @PathVariable Long id,
@@ -134,6 +167,7 @@ public class SyllabusController {
     // ==========================================
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @accountAccess.ownsSyllabus(#p0, authentication)")
     public ResponseEntity<Void>
     deleteSyllabus(
             @PathVariable Long id) {

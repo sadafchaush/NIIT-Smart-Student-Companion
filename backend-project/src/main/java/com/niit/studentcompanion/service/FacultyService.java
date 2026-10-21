@@ -12,6 +12,9 @@ import com.niit.studentcompanion.entity.Faculty;
 import com.niit.studentcompanion.entity.User;
 import com.niit.studentcompanion.repository.FacultyRepository;
 import com.niit.studentcompanion.repository.UserRepository;
+import com.niit.studentcompanion.repository.AssignmentRepository;
+import com.niit.studentcompanion.repository.AnnouncementRepository;
+import com.niit.studentcompanion.repository.NoteRepository;
 
 @Service
 public class FacultyService {
@@ -24,6 +27,15 @@ public class FacultyService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AssignmentRepository assignmentRepository;
+
+    @Autowired
+    private AnnouncementRepository announcementRepository;
+
+    @Autowired
+    private NoteRepository noteRepository;
 
 
     // =====================================================
@@ -89,6 +101,8 @@ public class FacultyService {
             throw new RuntimeException(
                     "Password must contain at least 6 characters");
         }
+        String rawPassword = faculty.getPassword();
+        faculty.setPassword(passwordEncoder.encode(rawPassword));
 
 
         // -----------------------------------------
@@ -144,7 +158,7 @@ public class FacultyService {
 
         user.setPassword(
                 passwordEncoder.encode(
-                        faculty.getPassword()
+                        rawPassword
                 )
         );
 
@@ -315,6 +329,9 @@ public class FacultyService {
         String newPassword =
                 facultyDetails.getPassword();
 
+        boolean passwordChanged = newPassword != null
+                && !newPassword.trim().isEmpty();
+
         if (newPassword != null &&
                 !newPassword.trim().isEmpty()) {
 
@@ -324,7 +341,7 @@ public class FacultyService {
                         "Password must contain at least 6 characters");
             }
 
-            faculty.setPassword(newPassword);
+            faculty.setPassword(passwordEncoder.encode(newPassword));
         }
 
 
@@ -372,18 +389,15 @@ public class FacultyService {
 
             user.setEmail(newEmail);
 
-            String password =
-                    updatedFaculty.getPassword();
-
-            if (password == null ||
-                    password.trim().isEmpty()) {
+            if (updatedFaculty.getPassword() == null
+                    || updatedFaculty.getPassword().isBlank()) {
 
                 throw new RuntimeException(
                         "Password is required to create Faculty login account");
             }
 
             user.setPassword(
-                    passwordEncoder.encode(password)
+                    updatedFaculty.getPassword()
             );
 
             user.setRole("FACULTY");
@@ -405,8 +419,7 @@ public class FacultyService {
 
             // Change password only when supplied
 
-            if (newPassword != null &&
-                    !newPassword.trim().isEmpty()) {
+            if (passwordChanged) {
 
                 user.setPassword(
                         passwordEncoder.encode(
@@ -448,6 +461,14 @@ public class FacultyService {
                                 )
                         );
 
+        Long facultyId = id.longValue();
+        if (assignmentRepository.existsByFacultyId(facultyId)
+                || announcementRepository.existsByFacultyId(facultyId)
+                || noteRepository.existsByFacultyId(facultyId)) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.CONFLICT,
+                    "Faculty is still referenced by assignments, announcements, or notes");
+        }
 
         // -----------------------------------------
         // Delete Login User

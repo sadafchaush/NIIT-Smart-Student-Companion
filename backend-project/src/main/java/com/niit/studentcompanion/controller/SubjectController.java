@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,15 +19,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.niit.studentcompanion.entity.Subject;
 import com.niit.studentcompanion.service.SubjectService;
+import com.niit.studentcompanion.repository.StudentRepository;
+import com.niit.studentcompanion.repository.FacultyRepository;
+import com.niit.studentcompanion.dto.SubjectResponse;
 
 @RestController
 @RequestMapping("/subjects")
-@CrossOrigin(origins = "*")
 public class SubjectController {
 
     @Autowired
     private SubjectService subjectService;
 
+    @Autowired
+    private StudentRepository studentRepository;
+
+    @Autowired
+    private FacultyRepository facultyRepository;
 
     // Add Subject
     @PostMapping
@@ -37,18 +47,44 @@ public class SubjectController {
 
     // Get All Subjects
     @GetMapping
-    public List<Subject> getAllSubjects() {
-
-        return subjectService.getAllSubjects();
+    public List<SubjectResponse> getAllSubjects(Authentication authentication) {
+        if (AuthorityUtils.authorityListToSet(authentication.getAuthorities())
+                .contains("ROLE_STUDENT")) {
+            Integer semester = studentRepository.findByEmail(authentication.getName())
+                    .map(student -> student.getSemester())
+                    .orElse(null);
+            return (semester == null
+                    ? List.<Subject>of()
+                    : subjectService.getSubjectsBySemester(semester))
+                    .stream()
+                    .map(SubjectResponse::from)
+                    .toList();
+        }
+        if (AuthorityUtils.authorityListToSet(authentication.getAuthorities())
+                .contains("ROLE_FACULTY")) {
+            Integer facultyId = facultyRepository
+                    .findByEmailIgnoreCase(authentication.getName())
+                    .map(faculty -> faculty.getFacultyId())
+                    .orElse(null);
+            return facultyId == null
+                    ? List.of()
+                    : subjectService.getSubjectsByFaculty(facultyId).stream()
+                            .map(SubjectResponse::from)
+                            .toList();
+        }
+        return subjectService.getAllSubjects().stream()
+                .map(SubjectResponse::from)
+                .toList();
     }
 
 
     // Get Subject By ID
     @GetMapping("/{id}")
-    public Subject getSubjectById(
+    @PreAuthorize("@accountAccess.canAccessSubject(#p0, authentication)")
+    public SubjectResponse getSubjectById(
             @PathVariable Integer id) {
 
-        return subjectService.getSubjectById(id);
+        return SubjectResponse.from(subjectService.getSubjectById(id));
     }
 
 

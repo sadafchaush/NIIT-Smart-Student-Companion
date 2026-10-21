@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.niit.studentcompanion.entity.Announcement;
 import com.niit.studentcompanion.entity.Subject;
 import com.niit.studentcompanion.repository.AnnouncementRepository;
+import com.niit.studentcompanion.repository.FacultyRepository;
 import com.niit.studentcompanion.repository.SubjectRepository;
 
 @Service
@@ -15,12 +16,15 @@ public class AnnouncementService {
 
     private final AnnouncementRepository announcementRepository;
     private final SubjectRepository subjectRepository;
+    private final FacultyRepository facultyRepository;
 
     public AnnouncementService(
             AnnouncementRepository announcementRepository,
-            SubjectRepository subjectRepository) {
+            SubjectRepository subjectRepository,
+            FacultyRepository facultyRepository) {
         this.announcementRepository = announcementRepository;
         this.subjectRepository = subjectRepository;
+        this.facultyRepository = facultyRepository;
     }
 
     private void validateAnnouncementAccess(Announcement announcement) {
@@ -65,18 +69,29 @@ public class AnnouncementService {
     }
 
     public List<Announcement> getAllAnnouncements() {
-        return announcementRepository.findAll();
+        return announcementRepository.findAll().stream()
+                .filter(this::hasValidReferences)
+                .toList();
     }
 
     public List<Announcement> getAnnouncementsBySemester(Integer semester) {
         if (semester == null) {
             return getAllAnnouncements();
         }
-        return announcementRepository.findBySemester(semester);
+        return announcementRepository.findBySemester(semester).stream()
+                .filter(this::hasValidReferences)
+                .toList();
+    }
+
+    public List<Announcement> getAnnouncementsByFaculty(Long facultyId) {
+        return announcementRepository.findByFacultyId(facultyId).stream()
+                .filter(this::hasValidReferences)
+                .toList();
     }
 
     public Optional<Announcement> getAnnouncementById(Long id) {
-        return announcementRepository.findById(id);
+        return announcementRepository.findById(id)
+                .filter(this::hasValidReferences);
     }
 
     public Announcement updateAnnouncement(
@@ -111,5 +126,16 @@ public class AnnouncementService {
         }
 
         announcementRepository.deleteById(id);
+    }
+
+    private boolean hasValidReferences(Announcement announcement) {
+        return announcement.getSubjectId() != null
+                && announcement.getFacultyId() != null
+                && announcement.getSubjectId() <= Integer.MAX_VALUE
+                && announcement.getFacultyId() <= Integer.MAX_VALUE
+                && subjectRepository.findById(
+                        announcement.getSubjectId().intValue()).isPresent()
+                && facultyRepository.findById(
+                        announcement.getFacultyId().intValue()).isPresent();
     }
 }

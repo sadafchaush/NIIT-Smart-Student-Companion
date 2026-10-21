@@ -291,7 +291,7 @@ async function loadSubmissions() {
                 // ------------------------------------------
 
                 const fileUrl =
-                    submission.fileUrl;
+                    safeHttpUrl(submission.fileUrl);
 
 
                 // ------------------------------------------
@@ -405,6 +405,21 @@ async function loadSubmissions() {
 // ======================================================
 // ESCAPE HTML
 // ======================================================
+
+function safeHttpUrl(value) {
+    if (!value) {
+        return null;
+    }
+
+    try {
+        const url = new URL(value, window.location.href);
+        return url.protocol === "http:" || url.protocol === "https:"
+            ? url.href
+            : null;
+    } catch {
+        return null;
+    }
+}
 
 function escapeHTML(value) {
 

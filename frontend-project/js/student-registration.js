@@ -72,11 +72,6 @@ const studentData = {
 };
 
 
-        console.log(
-            "Registration data:",
-            studentData
-        );
-
 
         try {
 

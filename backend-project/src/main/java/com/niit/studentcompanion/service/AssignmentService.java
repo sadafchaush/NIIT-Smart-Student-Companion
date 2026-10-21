@@ -75,6 +75,10 @@ public class AssignmentService {
         return assignmentRepository.findBySemester(semester);
     }
 
+    public List<Assignment> getAssignmentsByFaculty(Long facultyId) {
+        return assignmentRepository.findByFacultyId(facultyId);
+    }
+
     public Optional<Assignment> getAssignmentById(Long id) {
         return assignmentRepository.findById(id);
     }

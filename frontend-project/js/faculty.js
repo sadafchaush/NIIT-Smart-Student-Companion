@@ -238,7 +238,7 @@ async function saveFaculty() {
         password:
             document.getElementById(
                 "password"
-            ).value.trim()
+            ).value
     };
 
 
@@ -385,8 +385,7 @@ async function editFaculty(id) {
 
         document.getElementById(
             "password"
-        ).value =
-            faculty.password ?? "";
+        ).value = "";
 
 
         document.getElementById(

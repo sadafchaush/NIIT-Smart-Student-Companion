@@ -16,47 +16,65 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.niit.studentcompanion.entity.Faculty;
 import com.niit.studentcompanion.service.FacultyService;
+import com.niit.studentcompanion.dto.FacultyResponse;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
+import com.niit.studentcompanion.repository.FacultyRepository;
 
 @RestController
 @RequestMapping("/faculty")
-@CrossOrigin(origins = "*")
 public class FacultyController {
 
     @Autowired
     private FacultyService facultyService;
 
+    @Autowired
+    private FacultyRepository facultyRepository;
 
     // Add Faculty
     @PostMapping
-    public Faculty addFaculty(@RequestBody Faculty faculty) {
+    public FacultyResponse addFaculty(@RequestBody Faculty faculty) {
 
-        return facultyService.addFaculty(faculty);
+        return FacultyResponse.from(facultyService.addFaculty(faculty));
     }
 
 
     // Get All Faculty
     @GetMapping
-    public List<Faculty> getAllFaculty() {
-
-        return facultyService.getAllFaculty();
+    public List<FacultyResponse> getAllFaculty(Authentication authentication) {
+        List<Faculty> facultyList;
+        if (AuthorityUtils.authorityListToSet(authentication.getAuthorities())
+                .contains("ROLE_ADMIN")) {
+            facultyList = facultyService.getAllFaculty();
+        } else {
+            facultyList = facultyRepository
+                    .findByEmailIgnoreCase(authentication.getName())
+                    .map(List::of)
+                    .orElseGet(List::of);
+        }
+        return facultyList.stream()
+                .map(FacultyResponse::from)
+                .toList();
     }
 
 
     // Get Faculty By ID
     @GetMapping("/{id}")
-    public Faculty getFacultyById(@PathVariable Integer id) {
+    @PreAuthorize("hasRole('ADMIN') or @accountAccess.isOwnFacultyId(#p0, authentication)")
+    public FacultyResponse getFacultyById(@PathVariable Integer id) {
 
-        return facultyService.getFacultyById(id);
+        return FacultyResponse.from(facultyService.getFacultyById(id));
     }
 
 
     // Update Faculty
     @PutMapping("/{id}")
-    public Faculty updateFaculty(
+    public FacultyResponse updateFaculty(
             @PathVariable Integer id,
             @RequestBody Faculty faculty) {
 
-        return facultyService.updateFaculty(id, faculty);
+        return FacultyResponse.from(facultyService.updateFaculty(id, faculty));
     }
 
 

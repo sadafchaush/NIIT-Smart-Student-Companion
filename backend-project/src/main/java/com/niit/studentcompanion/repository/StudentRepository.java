@@ -17,4 +17,6 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     boolean existsByEmailAndStudentIdNot(String email, Long studentId);
 
     boolean existsByMobileAndStudentIdNot(String mobile, Long studentId);
+
+    java.util.List<Student> findBySemesterIn(java.util.Collection<Integer> semesters);
 }

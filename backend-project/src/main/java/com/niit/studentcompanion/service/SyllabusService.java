@@ -2,6 +2,8 @@ package com.niit.studentcompanion.service;
 
 import com.niit.studentcompanion.entity.Syllabus;
 import com.niit.studentcompanion.repository.SyllabusRepository;
+import com.niit.studentcompanion.repository.SubjectRepository;
+import com.niit.studentcompanion.entity.Subject;
 
 import org.springframework.stereotype.Service;
 
@@ -12,14 +14,26 @@ import java.util.Optional;
 public class SyllabusService {
 
     private final SyllabusRepository syllabusRepository;
+    private final SubjectRepository subjectRepository;
 
-    public SyllabusService(SyllabusRepository syllabusRepository) {
+    public SyllabusService(
+            SyllabusRepository syllabusRepository,
+            SubjectRepository subjectRepository) {
         this.syllabusRepository = syllabusRepository;
+        this.subjectRepository = subjectRepository;
     }
 
     // Get all syllabus
     public List<Syllabus> getAllSyllabus() {
         return syllabusRepository.findAll();
+    }
+
+    public List<Syllabus> getSyllabusBySemester(Integer semester) {
+        return syllabusRepository.findBySubjectSemester(semester);
+    }
+
+    public List<Syllabus> getSyllabusByFaculty(Integer facultyId) {
+        return syllabusRepository.findBySubjectFacultyFacultyId(facultyId);
     }
 
     // Get syllabus by ID
@@ -34,6 +48,8 @@ public class SyllabusService {
 
     // Create syllabus
     public Syllabus createSyllabus(Syllabus syllabus) {
+        syllabus.setSyllabusId(null);
+        syllabus.setSubject(resolveSubject(syllabus.getSubject()));
         return syllabusRepository.save(syllabus);
     }
 
@@ -53,7 +69,7 @@ public class SyllabusService {
         syllabus.setTitle(details.getTitle());
         syllabus.setDescription(details.getDescription());
         syllabus.setFileUrl(details.getFileUrl());
-        syllabus.setSubject(details.getSubject());
+        syllabus.setSubject(resolveSubject(details.getSubject()));
 
         return syllabusRepository.save(syllabus);
     }
@@ -68,5 +84,14 @@ public class SyllabusService {
         }
 
         syllabusRepository.deleteById(id);
+    }
+
+    private Subject resolveSubject(Subject suppliedSubject) {
+        if (suppliedSubject == null || suppliedSubject.getSubjectId() == null) {
+            throw new IllegalArgumentException("A subject is required");
+        }
+        return subjectRepository.findById(suppliedSubject.getSubjectId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Subject not found"));
     }
 }

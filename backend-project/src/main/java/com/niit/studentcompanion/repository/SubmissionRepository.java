@@ -16,9 +16,13 @@ public interface SubmissionRepository
     // Get all submissions for an assignment
     List<Submission> findByAssignmentId(Long assignmentId);
 
+    List<Submission> findByAssignmentIdIn(List<Long> assignmentIds);
+
     // Check whether student already submitted assignment
     Optional<Submission> findByAssignmentIdAndStudentId(
             Long assignmentId,
             Long studentId
     );
+
+    boolean existsByStudentId(Long studentId);
 }

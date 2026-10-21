@@ -8,4 +8,10 @@ import org.springframework.stereotype.Repository;
 public interface AnnouncementRepository extends JpaRepository<Announcement, Long> {
 
     java.util.List<Announcement> findBySemester(Integer semester);
+
+    java.util.List<Announcement> findByFacultyId(Long facultyId);
+
+    boolean existsBySubjectId(Long subjectId);
+
+    boolean existsByFacultyId(Long facultyId);
 }

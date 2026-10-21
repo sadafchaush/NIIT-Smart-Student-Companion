@@ -26,8 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const password = document
             .getElementById("password")
-            .value
-            .trim();
+            .value;
 
         if (!email || !password) {
             alert("Please enter email and password.");
@@ -64,8 +63,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 alert("Invalid response from server.");
                 return;
             }
-
-            console.log("Login data:", data);
 
             if (!response.ok) {
 
@@ -110,11 +107,6 @@ document.addEventListener("DOMContentLoaded", function () {
             localStorage.setItem(
                 "userRole",
                 role
-            );
-
-            console.log(
-                "Session saved:",
-                localStorage.getItem("loggedInUser")
             );
 
             alert("Login successful!");

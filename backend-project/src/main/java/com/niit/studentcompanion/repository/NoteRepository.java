@@ -19,4 +19,8 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
             Long facultyId);
 
     List<Note> findBySemester(Integer semester);
+
+    boolean existsBySubjectId(Long subjectId);
+
+    boolean existsByFacultyId(Long facultyId);
 }

@@ -13,6 +13,8 @@ import com.niit.studentcompanion.entity.DirectMessage;
 public interface DirectMessageRepository
         extends JpaRepository<DirectMessage, Long> {
 
+    boolean existsBySender_IdOrRecipient_Id(Long senderId, Long recipientId);
+
     @Query("""
             SELECT message
             FROM DirectMessage message

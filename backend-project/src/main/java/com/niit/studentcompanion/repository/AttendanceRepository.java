@@ -15,4 +15,23 @@ public interface AttendanceRepository
     List<Attendance> findByStudent(Student student);
 
     List<Attendance> findByStudentStudentId(Long studentId);
+
+    boolean existsByStudentStudentId(Long studentId);
+
+    java.util.List<Attendance> findBySubjectFacultyFacultyId(Integer facultyId);
+
+    java.util.List<Attendance> findByStudentStudentIdAndSubjectFacultyFacultyId(
+            Long studentId,
+            Integer facultyId);
+
+    boolean existsByStudentStudentIdAndSubjectSubjectIdAndAttendanceDate(
+            Long studentId,
+            Integer subjectId,
+            java.time.LocalDate attendanceDate);
+
+    boolean existsByStudentStudentIdAndSubjectSubjectIdAndAttendanceDateAndAttendanceIdNot(
+            Long studentId,
+            Integer subjectId,
+            java.time.LocalDate attendanceDate,
+            Integer attendanceId);
 }

@@ -11,4 +11,8 @@ public interface SyllabusRepository
     // Find syllabus by subject ID
     List<Syllabus> findBySubjectSubjectId(Long subjectId);
 
+    List<Syllabus> findBySubjectSemester(Integer semester);
+
+    List<Syllabus> findBySubjectFacultyFacultyId(Integer facultyId);
+
 }
