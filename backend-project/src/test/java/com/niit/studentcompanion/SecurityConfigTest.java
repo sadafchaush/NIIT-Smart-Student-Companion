@@ -14,7 +14,8 @@ class SecurityConfigTest {
     @Test
     void corsAllowsFacultyNotesUploadFromLocalFrontend() {
         CorsConfigurationSource source =
-                new SecurityConfig().corsConfigurationSource();
+                new SecurityConfig().corsConfigurationSource(
+                        "http://localhost:5500,http://127.0.0.1:5500");
         MockHttpServletRequest request =
                 new MockHttpServletRequest("OPTIONS", "/notes/upload");
         CorsConfiguration configuration =
@@ -27,5 +28,28 @@ class SecurityConfigTest {
         assertTrue(configuration.getAllowedMethods().contains("POST"));
         assertTrue(configuration.getAllowedMethods().contains("OPTIONS"));
         assertTrue(configuration.getAllowCredentials());
+    }
+
+    @Test
+    void corsRejectsWildcardOriginsWhenCredentialsAreEnabled() {
+        SecurityConfig config = new SecurityConfig();
+        org.junit.jupiter.api.Assertions.assertThrows(
+                IllegalStateException.class,
+                () -> config.corsConfigurationSource("*"));
+    }
+
+    @Test
+    void corsCanBeConfiguredForAnExplicitDeploymentOrigin() {
+        CorsConfigurationSource source =
+                new SecurityConfig().corsConfigurationSource(
+                        "https://companion.example.test");
+        CorsConfiguration configuration =
+                source.getCorsConfiguration(
+                        new MockHttpServletRequest("OPTIONS", "/notes/upload"));
+
+        assertEquals(
+                "https://companion.example.test",
+                configuration.checkOrigin("https://companion.example.test"));
+        assertNull(configuration.checkOrigin("https://untrusted.example.test"));
     }
 }

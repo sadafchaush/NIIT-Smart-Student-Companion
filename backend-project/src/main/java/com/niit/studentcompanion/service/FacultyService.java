@@ -2,11 +2,14 @@
 package com.niit.studentcompanion.service;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.niit.studentcompanion.entity.Faculty;
 import com.niit.studentcompanion.entity.User;
@@ -15,6 +18,7 @@ import com.niit.studentcompanion.repository.UserRepository;
 import com.niit.studentcompanion.repository.AssignmentRepository;
 import com.niit.studentcompanion.repository.AnnouncementRepository;
 import com.niit.studentcompanion.repository.NoteRepository;
+import com.niit.studentcompanion.security.PasswordPolicy;
 
 @Service
 public class FacultyService {
@@ -80,7 +84,7 @@ public class FacultyService {
 
         String email = faculty.getEmail()
                 .trim()
-                .toLowerCase();
+                .toLowerCase(Locale.ROOT);
 
         faculty.setEmail(email);
 
@@ -96,13 +100,14 @@ public class FacultyService {
                     "Faculty password is required");
         }
 
-        if (faculty.getPassword().length() < 6) {
-
-            throw new RuntimeException(
-                    "Password must contain at least 6 characters");
+        if (!PasswordPolicy.isValid(faculty.getPassword())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    PasswordPolicy.MESSAGE);
         }
         String rawPassword = faculty.getPassword();
-        faculty.setPassword(passwordEncoder.encode(rawPassword));
+        String encodedPassword = passwordEncoder.encode(rawPassword);
+        faculty.setPassword(encodedPassword);
 
 
         // -----------------------------------------
@@ -129,7 +134,7 @@ public class FacultyService {
         // Check User Email
         // -----------------------------------------
 
-        if (userRepository.existsByEmail(email)) {
+        if (userRepository.existsByEmailIgnoreCase(email)) {
 
             throw new RuntimeException(
                     "Email is already registered");
@@ -156,11 +161,7 @@ public class FacultyService {
 
         user.setEmail(email);
 
-        user.setPassword(
-                passwordEncoder.encode(
-                        rawPassword
-                )
-        );
+        user.setPassword(encodedPassword);
 
         user.setRole("FACULTY");
 
@@ -258,7 +259,7 @@ public class FacultyService {
         String newEmail =
                 facultyDetails.getEmail()
                         .trim()
-                        .toLowerCase();
+                        .toLowerCase(Locale.ROOT);
 
 
         // -----------------------------------------
@@ -268,7 +269,7 @@ public class FacultyService {
         if (oldEmail == null ||
                 !oldEmail.equalsIgnoreCase(newEmail)) {
 
-            if (userRepository.existsByEmail(newEmail)) {
+            if (userRepository.existsByEmailIgnoreCase(newEmail)) {
 
                 throw new RuntimeException(
                         "Email is already registered");
@@ -331,17 +332,17 @@ public class FacultyService {
 
         boolean passwordChanged = newPassword != null
                 && !newPassword.trim().isEmpty();
+        String encodedPassword = null;
 
-        if (newPassword != null &&
-                !newPassword.trim().isEmpty()) {
-
-            if (newPassword.length() < 6) {
-
-                throw new RuntimeException(
-                        "Password must contain at least 6 characters");
+        if (passwordChanged) {
+            if (!PasswordPolicy.isValid(newPassword)) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        PasswordPolicy.MESSAGE);
             }
 
-            faculty.setPassword(passwordEncoder.encode(newPassword));
+            encodedPassword = passwordEncoder.encode(newPassword);
+            faculty.setPassword(encodedPassword);
         }
 
 
@@ -363,7 +364,7 @@ public class FacultyService {
                 !oldEmail.trim().isEmpty()) {
 
             user = userRepository
-                    .findByEmail(
+                    .findByEmailIgnoreCase(
                             oldEmail
                                     .trim()
                                     .toLowerCase()
@@ -380,53 +381,15 @@ public class FacultyService {
         // -----------------------------------------
 
         if (user == null) {
+            throw new IllegalStateException(
+                    "Faculty login account is missing.");
+        }
 
-            user = new User();
-
-            user.setName(
-                    updatedFaculty.getFullName()
-            );
-
-            user.setEmail(newEmail);
-
-            if (updatedFaculty.getPassword() == null
-                    || updatedFaculty.getPassword().isBlank()) {
-
-                throw new RuntimeException(
-                        "Password is required to create Faculty login account");
-            }
-
-            user.setPassword(
-                    updatedFaculty.getPassword()
-            );
-
-            user.setRole("FACULTY");
-
-        } else {
-
-            // -------------------------------------
-            // Update Existing Login User
-            // -------------------------------------
-
-            user.setName(
-                    updatedFaculty.getFullName()
-            );
-
-            user.setEmail(newEmail);
-
-            user.setRole("FACULTY");
-
-
-            // Change password only when supplied
-
-            if (passwordChanged) {
-
-                user.setPassword(
-                        passwordEncoder.encode(
-                                newPassword
-                        )
-                );
-            }
+        user.setName(updatedFaculty.getFullName());
+        user.setEmail(newEmail);
+        user.setRole("FACULTY");
+        if (encodedPassword != null) {
+            user.setPassword(encodedPassword);
         }
 
 
@@ -477,7 +440,7 @@ public class FacultyService {
         if (faculty.getEmail() != null) {
 
             userRepository
-                    .findByEmail(
+                    .findByEmailIgnoreCase(
                             faculty.getEmail()
                                     .trim()
                                     .toLowerCase()

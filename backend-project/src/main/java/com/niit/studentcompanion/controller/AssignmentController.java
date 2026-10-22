@@ -78,11 +78,17 @@ public class AssignmentController {
 
     @GetMapping("/{id}")
     @PreAuthorize("@accountAccess.canAccessAssignment(#p0, authentication)")
-    public ResponseEntity<Assignment> getAssignmentById(
+    public ResponseEntity<?> getAssignmentById(
             @PathVariable Long id) {
-        return assignmentService.getAssignmentById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        Assignment assignment = assignmentService.getAssignmentById(id)
+                .orElse(null);
+        if (assignment == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiErrorResponse.of(
+                            HttpStatus.NOT_FOUND,
+                            "Assignment not found."));
+        }
+        return ResponseEntity.ok(assignment);
     }
 
     @PutMapping("/{id}")

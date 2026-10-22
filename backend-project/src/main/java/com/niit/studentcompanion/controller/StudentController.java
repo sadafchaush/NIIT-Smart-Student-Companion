@@ -2,7 +2,11 @@
 package com.niit.studentcompanion.controller;
 
 import java.util.List;
+import java.util.Locale;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,10 +27,14 @@ import com.niit.studentcompanion.repository.DirectMessageRepository;
 import com.niit.studentcompanion.dto.StudentResponse;
 import com.niit.studentcompanion.repository.FacultyRepository;
 import com.niit.studentcompanion.repository.SubjectRepository;
+import com.niit.studentcompanion.security.PasswordPolicy;
 
 @RestController
 @RequestMapping("/students")
 public class StudentController {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(StudentController.class);
 
     @Autowired
     private StudentRepository studentRepository;
@@ -92,18 +100,35 @@ public class StudentController {
     // GET STUDENT BY ID
     // =====================================================
 
+    @GetMapping("/pending")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<StudentResponse>> getPendingStudents() {
+        List<String> pendingEmails = userRepository
+                .findAllByRoleIgnoreCase("PENDING_STUDENT")
+                .stream()
+                .map(User::getEmail)
+                .filter(java.util.Objects::nonNull)
+                .toList();
+        List<StudentResponse> pendingStudents = pendingEmails.isEmpty()
+                ? List.of()
+                : studentRepository.findByEmailIn(pendingEmails).stream()
+                        .map(StudentResponse::from)
+                        .toList();
+        return ResponseEntity.ok(pendingStudents);
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or @accountAccess.canViewStudentId(#p0, authentication)")
     public ResponseEntity<?> getStudentById(
             @PathVariable Long id) {
-
-        return studentRepository.findById(id)
-                .map(student -> ResponseEntity.ok(StudentResponse.from(student)))
-                .orElseGet(() ->
-                        ResponseEntity
-                                .status(HttpStatus.NOT_FOUND)
-                                .body(null)
-                );
+        Student student = studentRepository.findById(id).orElse(null);
+        if (student == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiErrorResponse.of(
+                            HttpStatus.NOT_FOUND,
+                            "Student not found"));
+        }
+        return ResponseEntity.ok(StudentResponse.from(student));
     }
 
 
@@ -115,15 +140,14 @@ public class StudentController {
     @PreAuthorize("hasRole('ADMIN') or @accountAccess.canViewStudentEmail(#p0, authentication)")
     public ResponseEntity<?> getStudentByEmail(
             @PathVariable String email) {
-
-        return studentRepository
-                .findByEmail(email)
-                .map(student -> ResponseEntity.ok(StudentResponse.from(student)))
-                .orElseGet(() ->
-                        ResponseEntity
-                                .status(HttpStatus.NOT_FOUND)
-                                .body(null)
-                );
+        Student student = studentRepository.findByEmail(email).orElse(null);
+        if (student == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiErrorResponse.of(
+                            HttpStatus.NOT_FOUND,
+                            "Student not found"));
+        }
+        return ResponseEntity.ok(StudentResponse.from(student));
     }
 
 
@@ -138,20 +162,23 @@ public class StudentController {
     @PostMapping
     @Transactional
     public ResponseEntity<?> addStudent(
-            @RequestBody Student student) {
+            @RequestBody RegistrationRequest registration) {
 
         try {
+            Student student = new Student();
 
             // -----------------------------------------
             // Validate Name
             // -----------------------------------------
 
-            if (student.getName() == null ||
-                    student.getName().trim().isEmpty()) {
+            if (registration.name() == null ||
+                    registration.name().trim().isEmpty()) {
 
                 return ResponseEntity
                         .badRequest()
-                        .body("Student name is required");
+                        .body(ApiErrorResponse.of(
+                                HttpStatus.BAD_REQUEST,
+                                "Student name is required"));
             }
 
 
@@ -159,46 +186,62 @@ public class StudentController {
             // Validate Email
             // -----------------------------------------
 
-            if (student.getEmail() == null ||
-                    student.getEmail().trim().isEmpty()) {
+            if (registration.email() == null ||
+                    registration.email().trim().isEmpty()) {
 
                 return ResponseEntity
                         .badRequest()
-                        .body("Student email is required");
+                        .body(ApiErrorResponse.of(
+                                HttpStatus.BAD_REQUEST,
+                                "Student email is required"));
             }
 
-            String email = student.getEmail()
+            String email = registration.email()
                     .trim()
-                    .toLowerCase();
+                    .toLowerCase(Locale.ROOT);
 
+            student.setName(registration.name().trim());
             student.setEmail(email);
 
-            if (student.getMobile() == null
-                    || !student.getMobile().matches("\\d{10}")) {
+            if (registration.mobile() == null
+                    || !registration.mobile().matches("\\d{10}")) {
                 return ResponseEntity.badRequest()
-                        .body("Mobile number must contain exactly 10 digits");
+                        .body(ApiErrorResponse.of(
+                                HttpStatus.BAD_REQUEST,
+                                "Mobile number must contain exactly 10 digits"));
             }
+            student.setMobile(registration.mobile());
+            if (registration.course() == null
+                    || registration.course().trim().isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(ApiErrorResponse.of(
+                                HttpStatus.BAD_REQUEST,
+                                "Student course is required"));
+            }
+            student.setCourse(registration.course());
 
 
             // -----------------------------------------
             // Validate Password
             // -----------------------------------------
 
-            if (student.getPassword() == null ||
-                    student.getPassword().trim().isEmpty()) {
+            if (registration.password() == null ||
+                    registration.password().trim().isEmpty()) {
 
                 return ResponseEntity
                         .badRequest()
-                        .body("Student password is required");
+                        .body(ApiErrorResponse.of(
+                                HttpStatus.BAD_REQUEST,
+                                "Student password is required"));
             }
 
-            if (student.getPassword().length() < 6) {
+            if (!PasswordPolicy.isValid(registration.password())) {
 
                 return ResponseEntity
                         .badRequest()
-                        .body(
-                                "Password must contain at least 6 characters"
-                        );
+                        .body(ApiErrorResponse.of(
+                                HttpStatus.BAD_REQUEST,
+                                PasswordPolicy.MESSAGE));
             }
 
 
@@ -206,33 +249,20 @@ public class StudentController {
             // Check Student Email
             // -----------------------------------------
 
-            if (studentRepository
-                    .findByEmail(email)
-                    .isPresent()) {
-
-                return ResponseEntity
-                        .status(HttpStatus.CONFLICT)
-                        .body(
-                                "Student email already exists"
-                        );
+            if (studentRepository.existsByEmailIgnoreCase(email)) {
+                return registrationAccepted();
             }
 
             if (studentRepository.existsByMobile(student.getMobile())) {
-                return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body("Mobile number is already registered");
+                return registrationAccepted();
             }
 
             // -----------------------------------------
             // Check Login Email
             // -----------------------------------------
 
-            if (userRepository.existsByEmail(email)) {
-
-                return ResponseEntity
-                        .status(HttpStatus.CONFLICT)
-                        .body(
-                                "Email is already registered"
-                        );
+            if (userRepository.existsByEmailIgnoreCase(email)) {
+                return registrationAccepted();
             }
 
 
@@ -240,10 +270,12 @@ public class StudentController {
             // Save Student
             // -----------------------------------------
 
-            String rawPassword = student.getPassword();
-            student.setPassword(passwordEncoder.encode(rawPassword));
+            String rawPassword = registration.password();
+            String encodedPassword = passwordEncoder.encode(rawPassword);
+            student.setPassword(encodedPassword);
+            student.setSemester(null);
             Student savedStudent =
-                    studentRepository.save(student);
+                    studentRepository.saveAndFlush(student);
 
 
             // -----------------------------------------
@@ -258,40 +290,90 @@ public class StudentController {
 
             user.setEmail(email);
 
-            user.setPassword(
-                    passwordEncoder.encode(
-                            rawPassword
-                    )
-            );
+            user.setPassword(encodedPassword);
 
-            user.setRole("STUDENT");
+            user.setRole("PENDING_STUDENT");
 
 
             // -----------------------------------------
             // Save Login User
             // -----------------------------------------
 
-            userRepository.save(user);
+            userRepository.saveAndFlush(user);
 
 
             // -----------------------------------------
             // Return Student
             // -----------------------------------------
 
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(StudentResponse.from(savedStudent));
+            return registrationAccepted();
 
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            org.springframework.transaction.interceptor.TransactionAspectSupport
+                    .currentTransactionStatus().setRollbackOnly();
+            return registrationAccepted();
         } catch (Exception e) {
 
             org.springframework.transaction.interceptor.TransactionAspectSupport
                     .currentTransactionStatus().setRollbackOnly();
+            logger.error("Failed to register student", e);
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(
-                            "Error while adding student"
-                    );
+                    .body(ApiErrorResponse.of(
+                            HttpStatus.INTERNAL_SERVER_ERROR,
+                            "The request could not be completed."));
         }
+    }
+
+    @PatchMapping("/{id}/approval")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    public ResponseEntity<?> approveStudent(
+            @PathVariable Long id,
+            @RequestBody ApprovalRequest approval) {
+        if (approval == null
+                || approval.semester() == null
+                || approval.semester() < 1
+                || approval.semester() > 6) {
+            return ResponseEntity.badRequest()
+                    .body(ApiErrorResponse.of(
+                            HttpStatus.BAD_REQUEST,
+                            "Semester must be between 1 and 6"));
+        }
+
+        Student student = studentRepository.findById(id).orElse(null);
+        if (student == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiErrorResponse.of(
+                            HttpStatus.NOT_FOUND,
+                            "Student not found"));
+        }
+        User user = userRepository.findByEmail(student.getEmail())
+                .orElse(null);
+        if (user == null || !"PENDING_STUDENT".equalsIgnoreCase(user.getRole())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(ApiErrorResponse.of(
+                            HttpStatus.CONFLICT,
+                            "Student is not awaiting approval"));
+        }
+
+        student.setSemester(approval.semester());
+        user.setRole("STUDENT");
+        studentRepository.save(student);
+        userRepository.save(user);
+        return ResponseEntity.ok(StudentResponse.from(student));
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record RegistrationRequest(
+            String name,
+            String email,
+            String password,
+            String mobile,
+            String course) {
+    }
+
+    public record ApprovalRequest(Integer semester) {
     }
 
 
@@ -312,14 +394,13 @@ public class StudentController {
 
         try {
 
-            Student student =
-                    studentRepository.findById(id)
-                            .orElseThrow(() ->
-                                    new RuntimeException(
-                                            "Student not found with ID: "
-                                                    + id
-                                    )
-                            );
+            Student student = studentRepository.findById(id).orElse(null);
+            if (student == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(ApiErrorResponse.of(
+                                HttpStatus.NOT_FOUND,
+                                "Student not found"));
+            }
 
 
             String oldEmail = student.getEmail();
@@ -336,9 +417,9 @@ public class StudentController {
 
                 return ResponseEntity
                         .badRequest()
-                        .body(
-                                "Student name is required"
-                        );
+                        .body(ApiErrorResponse.of(
+                                HttpStatus.BAD_REQUEST,
+                                "Student name is required"));
             }
 
 
@@ -353,25 +434,29 @@ public class StudentController {
 
                 return ResponseEntity
                         .badRequest()
-                        .body(
-                                "Student email is required"
-                        );
+                        .body(ApiErrorResponse.of(
+                                HttpStatus.BAD_REQUEST,
+                                "Student email is required"));
             }
 
             String newEmail =
                     studentDetails.getEmail()
                             .trim()
-                            .toLowerCase();
+                            .toLowerCase(Locale.ROOT);
 
             if (studentDetails.getMobile() == null
                     || !studentDetails.getMobile().matches("\\d{10}")) {
                 return ResponseEntity.badRequest()
-                        .body("Mobile number must contain exactly 10 digits");
+                        .body(ApiErrorResponse.of(
+                                HttpStatus.BAD_REQUEST,
+                                "Mobile number must contain exactly 10 digits"));
             }
             if (studentRepository.existsByMobileAndStudentIdNot(
                     studentDetails.getMobile(), id)) {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body("Mobile number is already registered");
+                        .body(ApiErrorResponse.of(
+                                HttpStatus.CONFLICT,
+                                "Mobile number is already registered"));
             }
 
 
@@ -382,24 +467,22 @@ public class StudentController {
             if (oldEmail == null ||
                     !oldEmail.equalsIgnoreCase(newEmail)) {
 
-                if (userRepository.existsByEmail(newEmail)) {
+                if (userRepository.existsByEmailIgnoreCase(newEmail)) {
 
                     return ResponseEntity
                             .status(HttpStatus.CONFLICT)
-                            .body(
-                                    "Email is already registered"
-                            );
+                            .body(ApiErrorResponse.of(
+                                    HttpStatus.CONFLICT,
+                                    "Email is already registered"));
                 }
 
-                if (studentRepository
-                        .findByEmail(newEmail)
-                        .isPresent()) {
+                if (studentRepository.existsByEmailIgnoreCase(newEmail)) {
 
                     return ResponseEntity
                             .status(HttpStatus.CONFLICT)
-                            .body(
-                                    "Student email already exists"
-                            );
+                            .body(ApiErrorResponse.of(
+                                    HttpStatus.CONFLICT,
+                                    "Student email already exists"));
                 }
             }
 
@@ -436,19 +519,20 @@ public class StudentController {
             String newPassword =
                     studentDetails.getPassword();
 
-            if (newPassword != null &&
-                    !newPassword.trim().isEmpty()) {
+            String encodedPassword = null;
+            if (newPassword != null && !newPassword.trim().isEmpty()) {
 
-                if (newPassword.length() < 6) {
+                if (!PasswordPolicy.isValid(newPassword)) {
 
                     return ResponseEntity
                             .badRequest()
-                            .body(
-                                    "Password must contain at least 6 characters"
-                            );
+                            .body(ApiErrorResponse.of(
+                                    HttpStatus.BAD_REQUEST,
+                                    PasswordPolicy.MESSAGE));
                 }
 
-                student.setPassword(passwordEncoder.encode(newPassword));
+                encodedPassword = passwordEncoder.encode(newPassword);
+                student.setPassword(encodedPassword);
             }
 
 
@@ -470,10 +554,10 @@ public class StudentController {
                     !oldEmail.trim().isEmpty()) {
 
                 user = userRepository
-                        .findByEmail(
+                        .findByEmailIgnoreCase(
                                 oldEmail
                                         .trim()
-                                        .toLowerCase()
+                                        .toLowerCase(Locale.ROOT)
                         )
                         .orElse(null);
             }
@@ -487,60 +571,18 @@ public class StudentController {
             // -----------------------------------------
 
             if (user == null) {
+                org.springframework.transaction.interceptor.TransactionAspectSupport
+                        .currentTransactionStatus().setRollbackOnly();
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(ApiErrorResponse.of(
+                                HttpStatus.CONFLICT,
+                                "The student login account is missing."));
+            }
 
-                user = new User();
-
-                user.setName(
-                        updatedStudent.getName()
-                );
-
-                user.setEmail(newEmail);
-
-                String password =
-                        updatedStudent.getPassword();
-
-                if (password == null ||
-                        password.trim().isEmpty()) {
-
-                    org.springframework.transaction.interceptor.TransactionAspectSupport
-                            .currentTransactionStatus().setRollbackOnly();
-                    return ResponseEntity
-                            .badRequest()
-                            .body(
-                                    "Password is required to create Student login account"
-                            );
-                }
-
-                user.setPassword(password);
-
-                user.setRole("STUDENT");
-
-            } else {
-
-                // -------------------------------------
-                // Update Existing User
-                // -------------------------------------
-
-                user.setName(
-                        updatedStudent.getName()
-                );
-
-                user.setEmail(newEmail);
-
-                user.setRole("STUDENT");
-
-
-                // Change password only if supplied
-
-                if (newPassword != null &&
-                        !newPassword.trim().isEmpty()) {
-
-                    user.setPassword(
-                            passwordEncoder.encode(
-                                    newPassword
-                            )
-                    );
-                }
+            user.setName(updatedStudent.getName());
+            user.setEmail(newEmail);
+            if (encodedPassword != null) {
+                user.setPassword(encodedPassword);
             }
 
 
@@ -557,12 +599,14 @@ public class StudentController {
 
             org.springframework.transaction.interceptor.TransactionAspectSupport
                     .currentTransactionStatus().setRollbackOnly();
+            logger.error("Failed to update student", e);
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(
-                            "Error while updating student"
-                    );
+                    .body(ApiErrorResponse.of(
+                            HttpStatus.INTERNAL_SERVER_ERROR,
+                            "The request could not be completed."));
         }
+
     }
 
 
@@ -582,19 +626,18 @@ public class StudentController {
 
         try {
 
-            Student student =
-                    studentRepository.findById(id)
-                            .orElseThrow(() ->
-                                    new RuntimeException(
-                                            "Student not found with ID: "
-                                                    + id
-                                    )
-                            );
+            Student student = studentRepository.findById(id).orElse(null);
+            if (student == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(ApiErrorResponse.of(
+                                HttpStatus.NOT_FOUND,
+                                "Student not found"));
+            }
 
             var account = student.getEmail() == null
                     ? java.util.Optional.<User>empty()
-                    : userRepository.findByEmail(
-                            student.getEmail().trim().toLowerCase());
+                    : userRepository.findByEmailIgnoreCase(
+                            student.getEmail().trim().toLowerCase(Locale.ROOT));
             if (attendanceRepository
                     .existsByStudentStudentId(id)
                     || submissionRepository.existsByStudentId(id)
@@ -603,7 +646,9 @@ public class StudentController {
                                     user.getId(), user.getId()))
                             .isPresent()) {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body("Student has attendance, submissions, or messages and cannot be deleted");
+                        .body(ApiErrorResponse.of(
+                                HttpStatus.CONFLICT,
+                                "Student has attendance, submissions, or messages and cannot be deleted"));
             }
 
             // -----------------------------------------
@@ -616,10 +661,10 @@ public class StudentController {
             if (student.getEmail() != null) {
 
                 userRepository
-                        .findByEmail(
+                        .findByEmailIgnoreCase(
                                 student.getEmail()
                                         .trim()
-                                        .toLowerCase()
+                                        .toLowerCase(Locale.ROOT)
                         )
                         .ifPresent(user -> {
 
@@ -641,13 +686,22 @@ public class StudentController {
 
             org.springframework.transaction.interceptor.TransactionAspectSupport
                     .currentTransactionStatus().setRollbackOnly();
+            logger.error("Failed to delete student", e);
             return ResponseEntity
                     .status(
                             HttpStatus.INTERNAL_SERVER_ERROR
                     )
-                    .body(
-                            "Error while deleting student"
-                    );
+                    .body(ApiErrorResponse.of(
+                            HttpStatus.INTERNAL_SERVER_ERROR,
+                            "The request could not be completed."));
         }
+    }
+
+    private ResponseEntity<RegistrationResponse> registrationAccepted() {
+        return ResponseEntity.accepted().body(new RegistrationResponse(
+                "If the information can be registered, your request is pending admin review. If you already have an account, sign in."));
+    }
+
+    public record RegistrationResponse(String message) {
     }
 }

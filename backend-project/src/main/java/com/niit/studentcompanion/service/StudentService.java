@@ -3,10 +3,12 @@ package com.niit.studentcompanion.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.niit.studentcompanion.entity.Student;
 import com.niit.studentcompanion.repository.StudentRepository;
+import com.niit.studentcompanion.security.PasswordPolicy;
 
 @Service
 public class StudentService {
@@ -14,6 +16,8 @@ public class StudentService {
     @Autowired
     private StudentRepository repository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     // =====================================================
     // REGISTER NEW STUDENT
@@ -33,6 +37,7 @@ public class StudentService {
             throw new RuntimeException("Mobile number already exists");
         }
 
+        student.setPassword(passwordEncoder.encode(student.getPassword()));
         return repository.save(student);
     }
 
@@ -74,6 +79,7 @@ public class StudentService {
             }
         }
 
+        student.setPassword(passwordEncoder.encode(student.getPassword()));
         return repository.save(student);
     }
 
@@ -167,7 +173,7 @@ public class StudentService {
                 updatedStudent.getCourse());
 
         existingStudent.setPassword(
-                updatedStudent.getPassword());
+                passwordEncoder.encode(updatedStudent.getPassword()));
 
 
         // ==========================================
@@ -263,11 +269,8 @@ public class StudentService {
         // PASSWORD
         // ==========================================
 
-        if (student.getPassword() == null ||
-                student.getPassword().length() < 6) {
-
-            throw new RuntimeException(
-                    "Password must contain at least 6 characters");
+        if (!PasswordPolicy.isValid(student.getPassword())) {
+            throw new RuntimeException(PasswordPolicy.MESSAGE);
         }
 
 

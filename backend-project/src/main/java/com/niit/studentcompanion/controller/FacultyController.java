@@ -34,6 +34,7 @@ public class FacultyController {
 
     // Add Faculty
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public FacultyResponse addFaculty(@RequestBody Faculty faculty) {
 
         return FacultyResponse.from(facultyService.addFaculty(faculty));
@@ -70,6 +71,7 @@ public class FacultyController {
 
     // Update Faculty
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public FacultyResponse updateFaculty(
             @PathVariable Integer id,
             @RequestBody Faculty faculty) {
@@ -80,6 +82,7 @@ public class FacultyController {
 
     // Delete Faculty
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteFaculty(
             @PathVariable Integer id) {
 

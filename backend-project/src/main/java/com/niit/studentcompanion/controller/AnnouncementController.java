@@ -79,11 +79,17 @@ public class AnnouncementController {
 
     @GetMapping("/{id}")
     @PreAuthorize("@accountAccess.canAccessAnnouncement(#p0, authentication)")
-    public ResponseEntity<Announcement> getAnnouncementById(
+    public ResponseEntity<?> getAnnouncementById(
             @PathVariable Long id) {
-        return announcementService.getAnnouncementById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        Announcement announcement =
+                announcementService.getAnnouncementById(id).orElse(null);
+        if (announcement == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiErrorResponse.of(
+                            HttpStatus.NOT_FOUND,
+                            "Announcement not found."));
+        }
+        return ResponseEntity.ok(announcement);
     }
 
     @PutMapping("/{id}")

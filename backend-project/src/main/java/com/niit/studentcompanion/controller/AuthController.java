@@ -63,7 +63,10 @@ public class AuthController {
                     "Email and password are required");
         }
 
-        User user = authService.login(credentials.email(), credentials.password());
+        User user = authService.login(
+                credentials.email(),
+                credentials.password(),
+                request.getRemoteAddr());
         HttpSession previousSession = request.getSession(false);
         if (previousSession != null) {
             previousSession.invalidate();
@@ -82,7 +85,7 @@ public class AuthController {
         SecurityContextHolder.setContext(context);
         securityContextRepository.saveContext(context, request, response);
 
-        Long studentId = studentRepository.findByEmail(user.getEmail())
+        Long studentId = studentRepository.findByEmailIgnoreCase(user.getEmail())
                 .map(student -> student.getStudentId())
                 .orElse(null);
         Integer facultyId = facultyRepository
