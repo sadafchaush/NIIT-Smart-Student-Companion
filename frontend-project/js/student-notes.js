@@ -2,8 +2,8 @@
 // STUDENT STUDY NOTES
 // =====================================================
 
-const NOTES_API = "http://localhost:8080/notes";
-const SUBJECTS_API = "http://localhost:8080/subjects";
+const NOTES_API = `${window.NIIT_API_BASE_URL}/notes`;
+const SUBJECTS_API = `${window.NIIT_API_BASE_URL}/subjects`;
 
 let allNotes = [];
 let allSubjects = [];
@@ -314,7 +314,7 @@ async function loadNotes() {
 
             if (email) {
                 const studentResponse = await fetch(
-                    `http://localhost:8080/students/email/${encodeURIComponent(email)}`
+                    `${window.NIIT_API_BASE_URL}/students/email/${encodeURIComponent(email)}`
                 );
 
                 if (studentResponse.ok) {
@@ -641,7 +641,7 @@ function displayNotes(notes) {
     }
 
 
-    container.innerHTML = "";
+    container.replaceChildren();
 
 
     if (
@@ -701,34 +701,30 @@ function displayNotes(notes) {
             getFileUrl(note);
 
 
-        card.innerHTML = `
+        const heading = document.createElement("h3");
+        heading.textContent = `📘 ${title}`;
+        card.appendChild(heading);
 
-            <h3>
-                📘 ${escapeHtml(title)}
-            </h3>
-
-            <p>
-                <strong>Description:</strong>
-                <br>
-                ${escapeHtml(description)}
-            </p>
-
-            <p>
-                <strong>Class:</strong>
-                ${escapeHtml(className)}
-            </p>
-
-            <p>
-                <strong>Semester:</strong>
-                ${escapeHtml(semester)}
-            </p>
-
-            <p>
-                <strong>Subject:</strong>
-                ${escapeHtml(subjectName)}
-            </p>
-
-        `;
+        [
+            ["Description:", description],
+            ["Class:", className],
+            ["Semester:", semester],
+            ["Subject:", subjectName]
+        ].forEach(([label, value]) => {
+            const paragraph = document.createElement("p");
+            const strong = document.createElement("strong");
+            strong.textContent = label;
+            paragraph.appendChild(strong);
+            if (label === "Description:") {
+                paragraph.appendChild(document.createElement("br"));
+            } else {
+                paragraph.appendChild(document.createTextNode(" "));
+            }
+            paragraph.appendChild(
+                document.createTextNode(value == null ? "" : String(value))
+            );
+            card.appendChild(paragraph);
+        });
 
 
         // ================================
@@ -774,7 +770,7 @@ console.log("Download URL:", button.href);
                 document.createElement("p");
 
 
-            unavailable.innerHTML =
+            unavailable.textContent =
                 "⚠️ File not available";
 
 
@@ -795,67 +791,26 @@ console.log("Download URL:", button.href);
 // =====================================================
 
 function getFileUrl(note) {
-
-    // If backend already provides a URL
-    if (
-        note.fileUrl &&
-        note.fileUrl.trim() !== ""
-    ) {
-
-        let url =
-            note.fileUrl.trim();
-
-            console.log("Original fileUrl:", url);
-
-
-        // Relative backend URL
-        if (url.startsWith("/")) {
-
-            return "http://localhost:8080" + url;
-
-        }
-
-
-        return url;
-
+    let candidate = note.fileUrl;
+    if (!candidate && note.id !== null && note.id !== undefined
+            && Number.isSafeInteger(Number(note.id))) {
+        candidate = `${NOTES_API}/${encodeURIComponent(note.id)}/download`;
+    }
+    if (typeof candidate !== "string" || !candidate.trim()) {
+        return "";
     }
 
-
-    // Uploaded file
-    // Backend download endpoint
-    if (note.id !== null &&
-        note.id !== undefined) {
-
-        return (
-            "http://localhost:8080/notes/" +
-            note.id +
-            "/download"
-        );
-
+    try {
+        const url = new URL(candidate.trim(), NOTES_API);
+        return url.protocol === "http:" || url.protocol === "https:"
+            ? url.href
+            : "";
+    } catch {
+        return "";
     }
-
-
-    return "";
-
 }
 
 
 // =====================================================
 // ESCAPE HTML
 // =====================================================
-
-function escapeHtml(value) {
-
-    return String(value)
-
-        .replace(/&/g, "&amp;")
-
-        .replace(/</g, "&lt;")
-
-        .replace(/>/g, "&gt;")
-
-        .replace(/"/g, "&quot;")
-
-        .replace(/'/g, "&#039;");
-
-}

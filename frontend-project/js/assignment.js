@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8080/assignments";
+const API_URL = `${window.NIIT_API_BASE_URL}/assignments`;
 
 console.log("assignment.js loaded successfully");
 
@@ -50,7 +50,7 @@ async function loadAssignments() {
             assignments
         );
 
-        tableBody.innerHTML = "";
+        tableBody.replaceChildren();
 
         if (
             !assignments ||
@@ -74,27 +74,17 @@ async function loadAssignments() {
             const row =
                 document.createElement("tr");
 
-            row.innerHTML = `
-                <td>
-                    ${assignment.title || "No Title"}
-                </td>
-
-                <td>
-                    ${assignment.description || "No Description"}
-                </td>
-
-                <td>
-                    ${assignment.dueDate || "No Deadline"}
-                </td>
-
-                <td>
-                    ${assignment.subjectId || "N/A"}
-                </td>
-
-                <td>
-                    ${assignment.facultyId || "N/A"}
-                </td>
-            `;
+            [
+                assignment.title || "No Title",
+                assignment.description || "No Description",
+                assignment.dueDate || "No Deadline",
+                assignment.subjectId || "N/A",
+                assignment.facultyId || "N/A"
+            ].forEach(value => {
+                const cell = document.createElement("td");
+                cell.textContent = String(value);
+                row.appendChild(cell);
+            });
 
             tableBody.appendChild(row);
         });
@@ -108,15 +98,14 @@ async function loadAssignments() {
             error
         );
 
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="5" class="error">
-                    Unable to load assignments.
-                    Please make sure Spring Boot
-                    is running.
-                </td>
-            </tr>
-        `;
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 5;
+        cell.className = "error";
+        cell.textContent =
+            "Unable to load assignments. Please make sure Spring Boot is running.";
+        row.appendChild(cell);
+        tableBody.replaceChildren(row);
     }
 }
 

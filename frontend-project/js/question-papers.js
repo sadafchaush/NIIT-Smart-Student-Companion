@@ -1,5 +1,5 @@
 const QUESTION_PAPERS_API =
-    `http://${window.location.hostname}:8080/question-papers`;
+    `${window.NIIT_API_BASE_URL}/question-papers`;
 
 let questionPapers = [];
 

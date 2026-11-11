@@ -2,7 +2,7 @@
 console.log("faculty-subjects.js loaded successfully");
 
 
-const API_URL = "http://localhost:8080/subjects";
+const API_URL = `${window.NIIT_API_BASE_URL}/subjects`;
 
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -221,7 +221,7 @@ async function loadSubjects() {
            CLEAR OLD DATA
         ===================================== */
 
-        tbody.innerHTML = "";
+        tbody.replaceChildren();
 
 
         /* =====================================
@@ -273,41 +273,20 @@ async function loadSubjects() {
                 "";
 
 
-            row.innerHTML = `
+            [id, name, code, course, semester].forEach(value => {
+                const cell = document.createElement("td");
+                cell.textContent = value == null ? "" : String(value);
+                row.appendChild(cell);
+            });
 
-                <td>
-                    ${escapeHtml(id)}
-                </td>
-
-                <td>
-                    ${escapeHtml(name)}
-                </td>
-
-                <td>
-                    ${escapeHtml(code)}
-                </td>
-
-                <td>
-                    ${escapeHtml(course)}
-                </td>
-
-                <td>
-                    ${escapeHtml(semester)}
-                </td>
-
-                <td>
-
-                    <button
-                        class="view-button"
-                        onclick="viewSubject(${id})">
-
-                        👁 View Details
-
-                    </button>
-
-                </td>
-
-            `;
+            const actionCell = document.createElement("td");
+            const viewButton = document.createElement("button");
+            viewButton.type = "button";
+            viewButton.className = "view-button";
+            viewButton.textContent = "👁 View Details";
+            viewButton.addEventListener("click", () => viewSubject(id));
+            actionCell.appendChild(viewButton);
+            row.appendChild(actionCell);
 
 
             tbody.appendChild(row);
@@ -378,34 +357,5 @@ function goBack() {
 
     window.location.href =
         "faculty-dashboard.html";
-
-}
-
-
-/* =========================================
-   ESCAPE HTML
-========================================= */
-
-function escapeHtml(value) {
-
-    if (value === null ||
-        value === undefined) {
-
-        return "";
-
-    }
-
-
-    return String(value)
-
-        .replace(/&/g, "&amp;")
-
-        .replace(/</g, "&lt;")
-
-        .replace(/>/g, "&gt;")
-
-        .replace(/"/g, "&quot;")
-
-        .replace(/'/g, "&#039;");
 
 }

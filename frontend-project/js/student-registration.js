@@ -1,21 +1,62 @@
+
 console.log("student-registration.js loaded successfully");
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    const form =
-        document.getElementById("registrationForm");
+    const form = document.getElementById("registrationForm");
+    const message = document.getElementById("message");
 
-    const message =
-        document.getElementById("message");
+    // =====================================
+    // SHOW / HIDE PASSWORD
+    // =====================================
 
+    document.querySelectorAll(".toggle-password").forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            const targetId = button.dataset.target;
+            const passwordInput = document.getElementById(targetId);
+            const icon = button.querySelector("i");
+
+            if (!passwordInput || !icon) {
+                return;
+            }
+
+            const showPassword = passwordInput.type === "password";
+
+            passwordInput.type = showPassword ? "text" : "password";
+
+            icon.classList.toggle("fa-eye", !showPassword);
+            icon.classList.toggle("fa-eye-slash", showPassword);
+
+            const fieldName =
+                targetId === "confirmPassword"
+                    ? "confirm password"
+                    : "password";
+
+            button.setAttribute(
+                "aria-label",
+                `${showPassword ? "Hide" : "Show"} ${fieldName}`
+            );
+
+            button.setAttribute(
+                "aria-pressed",
+                String(showPassword)
+            );
+
+        });
+
+    });
+
+    // =====================================
+    // REGISTRATION FORM
+    // =====================================
 
     form.addEventListener("submit", async function (event) {
 
         event.preventDefault();
 
-
         console.log("REGISTER BUTTON CLICKED");
-
 
         const name =
             document.getElementById("name").value.trim();
@@ -29,21 +70,26 @@ document.addEventListener("DOMContentLoaded", function () {
         const course =
             document.getElementById("course").value;
 
-            const year =
-    document.getElementById("year").value;
-
-const semester =
-    Number(document.getElementById("semester").value);
-
         const password =
             document.getElementById("password").value;
 
         const confirmPassword =
             document.getElementById("confirmPassword").value;
 
-
         // =====================================
         // PASSWORD VALIDATION
+        // =====================================
+
+        if (Array.from(password).length !== 6) {
+            showMessage(
+                "Password must be exactly 6 characters.",
+                "error"
+            );
+            return;
+        }
+
+        // =====================================
+        // CONFIRM PASSWORD VALIDATION
         // =====================================
 
         if (password !== confirmPassword) {
@@ -56,22 +102,17 @@ const semester =
             return;
         }
 
-
         // =====================================
         // CREATE STUDENT OBJECT
         // =====================================
 
-const studentData = {
-    name: name,
-    email: email,
-    mobile: mobile,
-    course: course,
-    year: year,
-    semester: semester,
-    password: password
-};
-
-
+        const studentData = {
+            name: name,
+            email: email,
+            mobile: mobile,
+            course: course,
+            password: password
+        };
 
         try {
 
@@ -79,98 +120,97 @@ const studentData = {
             // CALL SPRING BOOT REGISTRATION API
             // =====================================
 
+            if (
+                typeof window.NIIT_API_BASE_URL !== "string" ||
+                !window.NIIT_API_BASE_URL.trim()
+            ) {
+                throw new Error(
+                    "API base URL is not configured. Check js/api.js."
+                );
+            }
+
             const response = await fetch(
-    "http://localhost:8080/students",
+                `${window.NIIT_API_BASE_URL}/students`,
                 {
                     method: "POST",
 
                     headers: {
-                        "Content-Type":
-                            "application/json"
+                        "Content-Type": "application/json"
                     },
 
-                    body:
-                        JSON.stringify(studentData)
+                    body: JSON.stringify(studentData)
                 }
             );
-
 
             console.log(
                 "Registration status:",
                 response.status
             );
 
-
             // =====================================
-            // NEW USER
+            // REGISTRATION REQUEST ACCEPTED
             // =====================================
 
-            if (response.status === 201) {
+            if (response.status === 202) {
 
                 showMessage(
-                    "Registration successful! Redirecting to Login...",
+                    "If the information can be registered, your request is pending admin review. If you already have an account, sign in.",
                     "success"
                 );
 
-
                 form.reset();
 
+                // Reset the eye icons and hide both passwords.
+                document.querySelectorAll(".toggle-password").forEach(
+                    function (button) {
 
-                setTimeout(function () {
+                        const input = document.getElementById(
+                            button.dataset.target
+                        );
 
-                    window.location.href =
-                        "login.html";
+                        const icon = button.querySelector("i");
 
-                }, 1800);
+                        if (input) {
+                            input.type = "password";
+                        }
 
+                        if (icon) {
+                            icon.classList.remove("fa-eye-slash");
+                            icon.classList.add("fa-eye");
+                        }
 
-                return;
-            }
+                        const fieldName =
+                            button.dataset.target === "confirmPassword"
+                                ? "confirm password"
+                                : "password";
 
+                        button.setAttribute(
+                            "aria-label",
+                            `Show ${fieldName}`
+                        );
 
-            // =====================================
-            // ALREADY REGISTERED
-            // =====================================
-
-            if (response.status === 409) {
-
-                showMessage(
-                    "This email is already registered. Please Login.",
-                    "error"
+                        button.setAttribute("aria-pressed", "false");
+                    }
                 );
 
-
-                setTimeout(function () {
-
-                    window.location.href =
-                        "login.html";
-
-                }, 2000);
-
-
                 return;
             }
 
-
             // =====================================
-            // OTHER ERROR
+            // OTHER SERVER RESPONSES
             // =====================================
 
-            const errorText =
-                await response.text();
+            const errorText = await response.text();
 
             console.error(
                 "Registration error:",
                 errorText
             );
 
-
             showMessage(
-                errorText ||
-                "Registration failed. Please try again.",
+                errorText || "Registration failed. Please try again.",
                 "error"
             );
-
 
         } catch (error) {
 
@@ -179,16 +219,17 @@ const studentData = {
                 error
             );
 
-
             showMessage(
-                "Unable to connect to Spring Boot.",
+                error.message ===
+                    "API base URL is not configured. Check js/api.js."
+                    ? error.message
+                    : "Unable to connect to Spring Boot. Check that the backend is running and the API URL is correct.",
                 "error"
             );
 
         }
 
     });
-
 
     // =====================================
     // MESSAGE FUNCTION
@@ -198,8 +239,7 @@ const studentData = {
 
         message.textContent = text;
 
-        message.className =
-            "message " + type;
+        message.className = "message " + type;
 
         message.style.display = "block";
     }

@@ -74,13 +74,153 @@
             gap: 20px;
         }
 
-        .student-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 17px;
-            font-weight: bold;
+        .notification-wrap {
+            position: relative;
         }
+
+        .notification-toggle {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            border-radius: 50%;
+            background: transparent;
+            color: white;
+            font-size: 19px;
+            cursor: pointer;
+        }
+
+        .notification-toggle:hover,
+        .notification-toggle:focus-visible {
+            background: rgba(255, 255, 255, 0.14);
+        }
+
+        .notification-count {
+            position: absolute;
+            top: -5px;
+            right: -7px;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 5px;
+            border: 2px solid #1e3a8a;
+            border-radius: 12px;
+            background: #dc2626;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            line-height: 16px;
+        }
+
+        .notification-count[hidden] {
+            display: none;
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            z-index: 5;
+            top: calc(100% + 12px);
+            right: 0;
+            width: min(390px, calc(100vw - 30px));
+            max-height: 440px;
+            overflow-y: auto;
+            border-radius: 10px;
+            background: white;
+            color: #111827;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+        }
+
+        .notification-dropdown[hidden] {
+            display: none;
+        }
+
+        .notification-heading {
+            position: sticky;
+            top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 17px;
+            border-bottom: 1px solid #e5e7eb;
+            background: white;
+        }
+
+        .notification-heading h2 {
+            margin: 0;
+            color: #1e3a8a;
+            font-size: 17px;
+        }
+
+        .notification-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .notification-item {
+            display: block;
+            width: 100%;
+            padding: 14px 17px;
+            border: 0;
+            border-bottom: 1px solid #eef0f3;
+            background: white;
+            color: inherit;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .notification-item:hover,
+        .notification-item:focus-visible {
+            background: #f3f6fc;
+        }
+
+        .notification-item.unread {
+            background: #eff6ff;
+        }
+
+        .notification-item strong,
+        .notification-item span,
+        .notification-item time {
+            display: block;
+        }
+
+        .notification-item strong {
+            margin-bottom: 4px;
+            color: #1e3a8a;
+        }
+
+        .notification-item span {
+            font-size: 14px;
+            line-height: 1.4;
+            overflow-wrap: anywhere;
+        }
+
+        .notification-item time {
+            margin-top: 7px;
+            color: #6b7280;
+            font-size: 12px;
+        }
+
+        .notification-empty {
+            padding: 22px 17px;
+            color: #6b7280;
+            font-size: 14px;
+            text-align: center;
+        }
+
+
+.student-profile-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.student-profile-link:hover {
+    opacity: 0.85;
+}
+
 
         .profile-icon {
             font-size: 21px;
@@ -436,6 +576,7 @@
         }
 
     </style>
+    <link rel="stylesheet" href="css/dashboard.css">
 
 </head>
 
@@ -476,17 +617,46 @@
 
         <div class="header-right">
 
-            <div class="student-info">
-
-                <span class="profile-icon">
-                    <i class="fa-solid fa-user"></i>
-                </span>
-
-                <span id="studentName">
-                    Student
-                </span>
-
+            <div class="notification-wrap">
+                <button
+                    class="notification-toggle"
+                    id="notificationToggle"
+                    type="button"
+                    aria-label="Notifications"
+                    aria-expanded="false"
+                    aria-controls="notificationDropdown">
+                    <i class="fa-solid fa-bell" aria-hidden="true"></i>
+                    <span class="notification-count" id="notificationCount" hidden></span>
+                </button>
+                <section
+                    class="notification-dropdown"
+                    id="notificationDropdown"
+                    aria-label="Notifications"
+                    hidden>
+                    <div class="notification-heading">
+                        <h2>Notifications</h2>
+                    </div>
+                    <ul class="notification-list" id="notificationList"></ul>
+                </section>
             </div>
+
+<div class="student-info">
+
+<a href="profile.html"
+   class="student-profile-link">
+
+        <span class="profile-icon">
+            <i class="fa-solid fa-user"></i>
+        </span>
+
+        <span id="studentName">
+            Student
+        </span>
+
+    </a>
+
+</div>
+
 
 
             <button
@@ -536,6 +706,7 @@
             <!-- NOTES -->
 
             <div class="dashboard-card">
+                <span class="module-status status-new">New</span>
 
                 <div class="card-icon">
                     <i class="fa-solid fa-book-open"></i>
@@ -568,6 +739,7 @@
             <!-- ASSIGNMENTS -->
 
             <div class="dashboard-card">
+                <span class="module-status status-new">New</span>
 
                 <div class="card-icon">
                     <i class="fa-solid fa-file-pen"></i>
@@ -600,6 +772,7 @@
             <!-- ATTENDANCE -->
 
             <div class="dashboard-card">
+                <span class="module-status status-updated">Updated</span>
 
                 <div class="card-icon">
                     <i class="fa-solid fa-calendar-check"></i>
@@ -631,6 +804,7 @@
             <!-- MESSAGES -->
 
             <div class="dashboard-card">
+                <span class="module-status status-new">New</span>
 
                 <div class="card-icon">
                     <i class="fa-solid fa-comments"></i>
@@ -750,39 +924,6 @@
             </div>
 
 
-
-            <!-- PROFILE -->
-
-            <div class="dashboard-card">
-
-                <div class="card-icon">
-                    <i class="fa-solid fa-user"></i>
-                </div>
-
-                <h3>
-                    Profile
-                </h3>
-
-                <p>
-                    View your profile information.
-                </p>
-
-                <button
-                    class="card-button"
-                    onclick="window.location.href='profile.html'">
-
-                    View Profile
-
-                    <span class="arrow">
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </span>
-
-                </button>
-
-            </div>
-
-
-
             <!-- GPA CALCULATOR -->
 
             <div class="dashboard-card">
@@ -860,6 +1001,7 @@
 
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/notifications.js"></script>
 
 
     <script>

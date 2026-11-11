@@ -68,7 +68,7 @@ class AuthSessionIntegrationTest {
                 Math.abs((long) UUID.randomUUID().getMostSignificantBits())
                         % 10_000_000_000L);
         String email = "test-" + suffix + "@example.invalid";
-        String password = "test-password-123";
+        String password = "test12";
         User faculty = new User();
         faculty.setName("Integration Faculty");
         faculty.setEmail("faculty-" + suffix + "@example.invalid");
@@ -107,8 +107,9 @@ class AuthSessionIntegrationTest {
                         .header("X-XSRF-TOKEN", csrf.token())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new Credentials(email, password))))
-                .andExpect(status().isUnauthorized());
+                         new Credentials(email, password, "STUDENT"))))
+                .andExpect(status().isUnauthorized());     
+
 
         MockHttpSession adminSession = createAdminSession();
         csrf = fetchCsrf();
@@ -127,7 +128,7 @@ class AuthSessionIntegrationTest {
                         .header("X-XSRF-TOKEN", csrf.token())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new Credentials(email, password))))
+                                new Credentials(email, password, "STUDENT"))))
                 .andExpect(status().isOk())
                 .andReturn();
         MockHttpSession session = (MockHttpSession) login.getRequest().getSession(false);
@@ -236,7 +237,7 @@ class AuthSessionIntegrationTest {
         Long protectedId = protectedStudent.getStudentId();
 
         String email = "forged-" + suffix + "@example.invalid";
-        String password = "test-password-123";
+        String password = "test12";
         String mobile = randomMobile();
         String payload = objectMapper.writeValueAsString(Map.of(
                 "studentId", protectedId,
@@ -361,7 +362,7 @@ class AuthSessionIntegrationTest {
     }
 
     @Test
-    void registrationRequiresStrongPassword() throws Exception {
+    void registrationRejectsPasswordsThatAreNotSixCharacters() throws Exception {
         Csrf csrf = fetchCsrf();
         mockMvc.perform(post("/students")
                         .cookie(csrf.cookie())
@@ -371,7 +372,7 @@ class AuthSessionIntegrationTest {
                                 new Registration(
                                         "Weak Password",
                                         "weak-" + UUID.randomUUID() + "@example.invalid",
-                                        "short7",
+                                        "short",
                                         randomMobile(),
                                         "BSc",
                                         1))))
@@ -442,7 +443,7 @@ class AuthSessionIntegrationTest {
             throws Exception {
         String suffix = UUID.randomUUID().toString().replace("-", "");
         String email = "update-" + suffix + "@example.invalid";
-        String originalPassword = "Original-password-123";
+        String originalPassword = "Init12";
         String mobile = randomMobile();
         Csrf csrf = fetchCsrf();
         mockMvc.perform(post("/students")
@@ -459,7 +460,7 @@ class AuthSessionIntegrationTest {
                                         1))))
                 .andExpect(status().isAccepted());
         Student student = studentRepository.findByEmail(email).orElseThrow();
-        String newPassword = "Renewed-password-456";
+        String newPassword = "Renew6";
 
         csrf = fetchCsrf();
         mockMvc.perform(put("/students/{id}", student.getStudentId())
@@ -516,7 +517,8 @@ class AuthSessionIntegrationTest {
                         .header("X-XSRF-TOKEN", csrf.token())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new Credentials(studentEmail, studentPassword))))
+                        new Credentials(studentEmail, studentPassword, "STUDENT"))))
+
                 .andExpect(status().isOk())
                 .andReturn();
         MockHttpSession studentSession =
@@ -549,7 +551,7 @@ class AuthSessionIntegrationTest {
     }
 
     @Test
-    void facultyPasswordsAreStrongAndSynchronizedToUsersTable()
+    void facultyPasswordsRequireExactlySixCharactersAndSynchronizeToUsersTable()
             throws Exception {
         String suffix = UUID.randomUUID().toString().replace("-", "");
         String email = "faculty-" + suffix + "@example.invalid";
@@ -563,7 +565,7 @@ class AuthSessionIntegrationTest {
                         .content(objectMapper.writeValueAsString(Map.of(
                                 "fullName", "Faculty Password Test",
                                 "email", email,
-                                "password", "short7"))))
+                                "password", "short"))))
                 .andExpect(status().isBadRequest());
 
         csrf = fetchCsrf();
@@ -575,7 +577,7 @@ class AuthSessionIntegrationTest {
                         .content(objectMapper.writeValueAsString(Map.of(
                                 "fullName", "Faculty Password Test",
                                 "email", email,
-                                "password", "Faculty-password-123",
+                                "password", "Fac12!",
                                 "phone", "5551234567",
                                 "department", "Computer Science",
                                 "designation", "Lecturer"))))
@@ -584,11 +586,11 @@ class AuthSessionIntegrationTest {
         Faculty faculty = facultyRepository.findByEmailIgnoreCase(email)
                 .orElseThrow();
         assertTrue(passwordEncoder.matches(
-                "Faculty-password-123",
+                "Fac12!",
                 userRepository.findByEmailIgnoreCase(email)
                         .orElseThrow()
                         .getPassword()));
-        String newPassword = "Renewed-faculty-456";
+        String newPassword = "Fac456";
 
         csrf = fetchCsrf();
         mockMvc.perform(put("/faculty/{id}", faculty.getFacultyId())
@@ -629,7 +631,8 @@ class AuthSessionIntegrationTest {
                         .header("X-XSRF-TOKEN", csrf.token())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new Credentials(email, password))))
+                        new Credentials(email, password, "ADMIN"))))
+
                 .andExpect(status().isOk())
                 .andReturn();
         return (MockHttpSession) login.getRequest().getSession(false);
@@ -649,7 +652,8 @@ class AuthSessionIntegrationTest {
                 .header("X-XSRF-TOKEN", csrf.token())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(
-                        new Credentials(email, password))));
+                new Credentials(email, password, "STUDENT"))));
+
     }
 
     private String randomMobile() {
@@ -673,7 +677,7 @@ class AuthSessionIntegrationTest {
     private record Csrf(jakarta.servlet.http.Cookie cookie, String token) {
     }
 
-    private record Credentials(String email, String password) {
+    private record Credentials(String email, String password, String role) {
     }
 
     private record MessageRequest(Long recipientId, String content) {

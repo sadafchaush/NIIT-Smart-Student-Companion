@@ -1,47 +1,50 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" type="image/png" href="images/icon-512.png">
 
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
     <title>NIIT Smart Student Companion</title>
 
-    <!-- Font Awesome 6.5.2 -->
+    <link rel="icon"
+          type="image/png"
+          href="images/icon-512.png">
+
+    <!-- Font Awesome -->
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-    <!-- Index Page CSS -->
+    <!-- Existing Landing Page CSS -->
     <link rel="stylesheet" href="css/index.css">
 
 </head>
 
-
 <body>
 
     <!-- Header -->
-
     <header class="top-header">
 
         <div class="header-content">
 
-            <img
-                src="images/icon-192.png"
-                alt="NIIT Logo"
-                class="header-logo"
-            >
+            <img src="images/icon-192.png"
+                 alt="NIIT Logo"
+                 class="header-logo">
 
-            <div>
+            <div class="header-title">
 
                 <h1>NIIT Smart Student Companion</h1>
 
-                <p>
-                    Academic Management System
-                </p>
+                <p>Academic Management System</p>
 
+            </div>
+
+            <div class="academic-year">
+                <i class="fa-regular fa-calendar"></i>
+                <span>Academic Year 2026–2027</span>
             </div>
 
         </div>
@@ -50,59 +53,42 @@
 
 
     <!-- Main Content -->
-
     <main class="main-container">
 
-        <section class="welcome-card">
+        <!-- Hero Section -->
+        <section class="hero-section">
 
-            <!-- Logo -->
+            <h2>
+                Your campus,
+                <span>connected.</span>
+            </h2>
+
+            <p>
+                Everything you need for a smarter academic journey.
+            </p>
+
+        </section>
+
+
+        <!-- Academic Information Banner -->
+        <section class="welcome-card">
 
             <div class="logo-container">
 
-                <img
-                    src="images/icon-512.png"
-                    alt="NIIT Smart Student Companion Logo"
-                    class="main-logo"
-                >
+                <img src="images/icon-512.png"
+                     alt="NIIT Smart Student Companion"
+                     class="main-logo">
 
             </div>
 
-
-            <!-- Welcome Text -->
-
             <div class="welcome-content">
 
-                <h2>
-                    Welcome to NIIT Smart Student Companion
-                </h2>
+                <h2>One place for your academic life</h2>
 
                 <p class="description">
-
-                    Manage students, faculty, attendance,
-                    assignments, notes, announcements,
-                    subjects and syllabus from one place.
-
-                </p>
-
-
-                <!-- Get Started Button -->
-
-                <button
-                    id="loginButton"
-                    class="get-started-button"
-                    type="button"
-                >
-
-                    Get Started / Login
-
-                </button>
-
-
-                <p class="login-message">
-
-                    Students, Faculty and Admin can
-                    access the system using their account.
-
+                    Access learning resources, assignments,
+                    attendance, syllabus and campus updates
+                    from one convenient platform.
                 </p>
 
             </div>
@@ -110,67 +96,93 @@
         </section>
 
 
-        <!-- Features -->
-
+        <!-- Portal Selection -->
         <section class="features-section">
 
-            <h2>What You Can Do</h2>
+            <h2>Choose Your Portal</h2>
 
+            <p class="portal-subtitle">
+                Select your account type to continue
+            </p>
 
             <div class="features-grid">
 
-                <!-- Students -->
-
-                <div class="feature-card">
+                <!-- Student Portal -->
+                <article class="feature-card">
 
                     <div class="feature-icon">
                         <i class="fa-solid fa-user-graduate"></i>
                     </div>
 
-                    <h3>Students</h3>
+                    <h3>Student Portal</h3>
 
                     <p>
                         View notes, assignments,
                         attendance and syllabus.
                     </p>
 
-                </div>
+                    <a href="login.html?role=STUDENT"
+                       class="portal-login-btn">
+
+                        Login as Student
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </a>
+
+                </article>
 
 
-                <!-- Faculty -->
-
-                <div class="feature-card">
+                <!-- Faculty Portal -->
+                <article class="feature-card">
 
                     <div class="feature-icon">
                         <i class="fa-solid fa-chalkboard-user"></i>
                     </div>
 
-                    <h3>Faculty</h3>
+                    <h3>Faculty Portal</h3>
 
                     <p>
-                        Manage notes, assignments
-                        and student attendance.
+                        Upload learning materials,
+                        manage assignments and attendance.
                     </p>
 
-                </div>
+                    <a href="login.html?role=FACULTY"
+                       class="portal-login-btn">
+
+                        Login as Faculty
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </a>
+
+                </article>
 
 
-                <!-- Admin -->
-
-                <div class="feature-card">
+                <!-- Admin Portal -->
+                <article class="feature-card">
 
                     <div class="feature-icon">
-                        <i class="fa-solid fa-gear"></i>
+                        <i class="fa-solid fa-shield-halved"></i>
                     </div>
 
-                    <h3>Admin</h3>
+                    <h3>Admin Portal</h3>
 
                     <p>
                         Manage students, faculty,
                         subjects and announcements.
                     </p>
 
-                </div>
+                    <a href="login.html?role=ADMIN"
+                       class="portal-login-btn">
+
+                        Login as Admin
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </a>
+
+                </article>
 
             </div>
 
@@ -180,11 +192,10 @@
 
 
     <!-- Footer -->
-
     <footer class="footer">
 
         <p>
-            © 2026 NIIT Smart Student Companion
+            &copy; 2026 NIIT Smart Student Companion
         </p>
 
         <p>
@@ -194,8 +205,7 @@
     </footer>
 
 
-    <!-- Index Page JavaScript -->
-
+    <!-- Existing JavaScript -->
     <script src="js/index.js"></script>
 
 </body>

@@ -1,5 +1,5 @@
 
-const API_URL = "http://localhost:8080/students";
+const API_URL = `${window.NIIT_API_BASE_URL}/students`;
 
 console.log("faculty-students.js loaded successfully");
 
@@ -68,7 +68,7 @@ async function loadStudents() {
 
         // Clear old rows
 
-        tbody.innerHTML = "";
+        tbody.replaceChildren();
 
 
         // Check if students exist
@@ -96,29 +96,17 @@ async function loadStudents() {
                 document.createElement("tr");
 
 
-            row.innerHTML = `
-
-                <td>
-                    ${student.id ?? "N/A"}
-                </td>
-
-                <td>
-                    ${student.name ?? "N/A"}
-                </td>
-
-                <td>
-                    ${student.email ?? "N/A"}
-                </td>
-
-                <td>
-                    ${student.mobile ?? "N/A"}
-                </td>
-
-                <td>
-                    ${student.course ?? "N/A"}
-                </td>
-
-            `;
+            [
+                student.id ?? "N/A",
+                student.name ?? "N/A",
+                student.email ?? "N/A",
+                student.mobile ?? "N/A",
+                student.course ?? "N/A"
+            ].forEach(value => {
+                const cell = document.createElement("td");
+                cell.textContent = String(value);
+                row.appendChild(cell);
+            });
 
 
             tbody.appendChild(row);

@@ -1,6 +1,3 @@
-// ======================================================
-// LOGIN.JS
-// ======================================================
 
 console.log("login.js loaded successfully");
 
@@ -13,20 +10,35 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
+    // Read selected role from landing-page URL
+    const params = new URLSearchParams(window.location.search);
+
+    let role = (params.get("role") || "STUDENT")
+        .trim()
+        .toUpperCase();
+
+    const allowedRoles = ["STUDENT", "FACULTY", "ADMIN"];
+
+    if (!allowedRoles.includes(role)) {
+        role = "STUDENT";
+    }
+
+    // Display selected portal
+    const selectedRole = document.getElementById("selectedRole");
+
+    if (selectedRole) {
+        selectedRole.textContent = "Login as " + role;
+    }
+
     loginForm.addEventListener("submit", async function (event) {
 
         event.preventDefault();
 
         console.log("LOGIN BUTTON CLICKED");
+        console.log("Selected role:", role);
 
-        const email = document
-            .getElementById("email")
-            .value
-            .trim();
-
-        const password = document
-            .getElementById("password")
-            .value;
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
 
         if (!email || !password) {
             alert("Please enter email and password.");
@@ -35,134 +47,99 @@ document.addEventListener("DOMContentLoaded", function () {
 
         try {
 
+            // Get CSRF token first
+            const csrfResponse = await fetch(
+                `${window.NIIT_API_BASE_URL}/auth/csrf`,
+                {
+                    method: "GET",
+                    credentials: "include"
+                }
+            );
+
+            if (!csrfResponse.ok) {
+                throw new Error("Unable to obtain CSRF token.");
+            }
+
+            const csrfData = await csrfResponse.json();
+
+            const csrfToken = csrfData.token;
+
+            if (!csrfToken) {
+                throw new Error("CSRF token was not received.");
+            }
+
+            // Send login request with selected role
             const response = await fetch(
-                `http://${window.location.hostname}:8080/auth/login`,
+                `${window.NIIT_API_BASE_URL}/auth/login`,
                 {
                     method: "POST",
                     credentials: "include",
 
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": csrfToken
                     },
 
                     body: JSON.stringify({
                         email: email,
-                        password: password
+                        password: password,
+                        role: role
                     })
                 }
             );
 
             console.log("Login response:", response.status);
 
-            let data;
-
-            try {
-                data = await response.json();
-            } catch (error) {
-                console.error("Invalid JSON response.");
-                alert("Invalid response from server.");
-                return;
-            }
+            const data = await response.json();
 
             if (!response.ok) {
-
                 alert(
                     data.message ||
-                    "Login failed. Please check your email and password."
+                    "Login failed. Check your email, password and selected portal."
                 );
-
                 return;
             }
-
-            // ------------------------------------------------
-            // CHECK ROLE
-            // ------------------------------------------------
 
             if (!data.role) {
-
-                console.error("Role missing from login response:", data);
-
-                alert(
-                    "Login successful, but user role was not received."
-                );
-
+                console.error("Role missing:", data);
+                alert("Login successful, but role was not received.");
                 return;
             }
 
-            const role = String(data.role)
+            const actualRole = String(data.role)
                 .trim()
                 .toUpperCase();
 
-            console.log("USER ROLE:", role);
+            if (actualRole !== role) {
+                alert("The account role does not match the selected portal.");
+                return;
+            }
 
-            // ------------------------------------------------
-            // SAVE SESSION
-            // ------------------------------------------------
-
-            localStorage.setItem(
-                "loggedInUser",
-                JSON.stringify(data)
-            );
-
-            localStorage.setItem(
-                "userRole",
-                role
-            );
+            // Save session
+            localStorage.setItem("loggedInUser", JSON.stringify(data));
+            localStorage.setItem("userRole", actualRole);
 
             alert("Login successful!");
 
-            // ------------------------------------------------
-            // ROLE BASED NAVIGATION
-            // ------------------------------------------------
-
-            switch (role) {
+            // Redirect according to actual role
+            switch (actualRole) {
 
                 case "ADMIN":
-
-                    console.log("Redirecting to Admin Dashboard");
-
-                    window.location.replace(
-                        "admin-dashboard.html"
-                    );
-
+                    window.location.replace("admin-dashboard.html");
                     break;
 
                 case "FACULTY":
-
-                    console.log("Redirecting to Faculty Dashboard");
-
-                    window.location.replace(
-                        "faculty-dashboard.html"
-                    );
-
+                    window.location.replace("faculty-dashboard.html");
                     break;
 
                 case "STUDENT":
-
-                    console.log("Redirecting to Student Dashboard");
-
-                    window.location.replace(
-                        "student-dashboard.html"
-                    );
-
+                    window.location.replace("student-dashboard.html");
                     break;
 
                 default:
-
-                    console.error(
-                        "Unknown role:",
-                        role
-                    );
-
                     localStorage.removeItem("loggedInUser");
                     localStorage.removeItem("userRole");
-
-                    alert(
-                        "Unknown user role: " +
-                        data.role
-                    );
-
-                    break;
+                    alert("Unknown user role.");
             }
 
         } catch (error) {
@@ -170,8 +147,8 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("LOGIN ERROR:", error);
 
             alert(
-                "Unable to connect to Spring Boot.\n\n" +
-                "Make sure the backend is running on port 8080."
+                error.message ||
+                "Unable to connect to backend. Check whether Spring Boot is running."
             );
         }
     });

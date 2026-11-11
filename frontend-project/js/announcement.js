@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8080/announcements";
+const API_URL = `${window.NIIT_API_BASE_URL}/announcements`;
 
 console.log("announcement.js loaded successfully");
 
@@ -21,7 +21,7 @@ async function loadAnnouncements() {
 
             if (email) {
                 const studentResponse = await fetch(
-                    `http://localhost:8080/students/email/${encodeURIComponent(email)}`
+                    `${window.NIIT_API_BASE_URL}/students/email/${encodeURIComponent(email)}`
                 );
 
                 if (studentResponse.ok) {
@@ -59,7 +59,7 @@ async function loadAnnouncements() {
             announcements
         );
 
-        container.innerHTML = "";
+        container.replaceChildren();
 
         if (
             !announcements ||
@@ -84,31 +84,24 @@ async function loadAnnouncements() {
                 card.className =
                     "announcement-card";
 
-                card.innerHTML = `
+                const title = document.createElement("h3");
+                title.textContent = `📢 ${announcement.title ?? ""}`;
+                card.appendChild(title);
 
-                    <h3>
-                        📢 ${announcement.title}
-                    </h3>
+                const message = document.createElement("p");
+                message.textContent = announcement.message ?? "";
+                card.appendChild(message);
 
-                    <p>
-                        ${announcement.message}
-                    </p>
+                const date = document.createElement("p");
+                date.className = "announcement-date";
+                date.textContent =
+                    `📅 Date: ${announcement.announcementDate ?? ""}`;
+                card.appendChild(date);
 
-                    <p class="announcement-date">
-
-                        📅 Date:
-                        ${announcement.announcementDate}
-
-                    </p>
-
-                    <p>
-
-                        Faculty ID:
-                        ${announcement.facultyId}
-
-                    </p>
-
-                `;
+                const faculty = document.createElement("p");
+                faculty.textContent =
+                    `Faculty ID: ${announcement.facultyId ?? ""}`;
+                card.appendChild(faculty);
 
                 container.appendChild(card);
             }
@@ -123,19 +116,11 @@ async function loadAnnouncements() {
             error
         );
 
-        container.innerHTML = `
-
-            <p class="error">
-
-                Unable to load announcements.
-
-                <br><br>
-
-                ${error.message}
-
-            </p>
-
-        `;
+        const errorMessage = document.createElement("p");
+        errorMessage.className = "error";
+        errorMessage.textContent =
+            `Unable to load announcements. ${error.message}`;
+        container.replaceChildren(errorMessage);
     }
 }
 

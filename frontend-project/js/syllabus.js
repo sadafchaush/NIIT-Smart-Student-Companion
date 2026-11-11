@@ -1,5 +1,4 @@
-const API_BASE_URL =
-    "http://localhost:8080";
+const API_BASE_URL = window.NIIT_API_BASE_URL;
 
 console.log(
     "syllabus.js loaded successfully"
@@ -55,7 +54,7 @@ async function loadSyllabus() {
         );
 
 
-        container.innerHTML = "";
+        container.replaceChildren();
 
 
         if (
@@ -110,63 +109,50 @@ async function loadSyllabus() {
                         : "";
 
 
-                let fileButton = "";
+                const heading = document.createElement("h3");
+                heading.textContent = subjectName;
+                card.appendChild(heading);
 
+                [
+                    ["Subject Code:", subjectCode],
+                    ["Semester:", semester]
+                ].forEach(([label, value]) => {
+                    const info = document.createElement("div");
+                    info.className = "subject-info";
+                    const strong = document.createElement("strong");
+                    strong.textContent = label + " ";
+                    info.appendChild(strong);
+                    info.appendChild(
+                        document.createTextNode(value == null ? "" : String(value))
+                    );
+                    card.appendChild(info);
+                });
+
+                const description = document.createElement("p");
+                description.className = "description";
+                description.textContent =
+                    syllabus.description || "No description available.";
+                card.appendChild(description);
 
                 if (syllabus.fileUrl) {
-
-                    fileButton = `
-                        <a
-                            href="${syllabus.fileUrl}"
-                            target="_blank"
-                            class="view-btn">
-
-                            View Syllabus
-
-                        </a>
-                    `;
-
-                }
-
-
-                card.innerHTML = `
-
-                    <h3>
-                        ${subjectName}
-                    </h3>
-
-                    <div class="subject-info">
-
-                        <strong>
-                            Subject Code:
-                        </strong>
-
-                        ${subjectCode}
-
-                    </div>
-
-                    <div class="subject-info">
-
-                        <strong>
-                            Semester:
-                        </strong>
-
-                        ${semester}
-
-                    </div>
-
-                    <p class="description">
-
-                        ${
-                            syllabus.description
-                            || "No description available."
+                    try {
+                        const fileUrl = new URL(
+                            syllabus.fileUrl,
+                            API_BASE_URL
+                        );
+                        if (["http:", "https:"].includes(fileUrl.protocol)) {
+                            const link = document.createElement("a");
+                            link.href = fileUrl.href;
+                            link.target = "_blank";
+                            link.rel = "noopener noreferrer";
+                            link.className = "view-btn";
+                            link.textContent = "View Syllabus";
+                            card.appendChild(link);
                         }
-
-                    </p>
-
-                    ${fileButton}
-
-                `;
+                    } catch (error) {
+                        console.error("Invalid syllabus URL:", error);
+                    }
+                }
 
 
                 container.appendChild(card);
@@ -183,19 +169,11 @@ async function loadSyllabus() {
         );
 
 
-        container.innerHTML = `
-
-            <div class="error">
-
-                Unable to load syllabus.
-
-                <br><br>
-
-                ${error.message}
-
-            </div>
-
-        `;
+        const errorMessage = document.createElement("div");
+        errorMessage.className = "error";
+        errorMessage.textContent =
+            `Unable to load syllabus. ${error.message}`;
+        container.replaceChildren(errorMessage);
 
     }
 

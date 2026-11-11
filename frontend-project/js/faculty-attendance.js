@@ -1,5 +1,5 @@
 
-const API_BASE_URL = "http://localhost:8080";
+const API_BASE_URL = window.NIIT_API_BASE_URL;
 
 console.log("faculty-attendance.js loaded successfully");
 
@@ -110,8 +110,13 @@ async function loadSubjects() {
 
     try {
 
-        const response =
-            await fetch(`${API_BASE_URL}/subjects`);
+       
+const response = await fetch(
+    SUBJECTS_API,
+    {
+        credentials: "include"
+    }
+);
 
         if (!response.ok) {
             throw new Error("Unable to load subjects");
@@ -370,7 +375,7 @@ async function loadAttendance() {
             await response.json();
 
 
-        tbody.innerHTML = "";
+        tbody.replaceChildren();
 
 
         if (
@@ -408,54 +413,35 @@ async function loadAttendance() {
                         : "N/A";
 
 
-                row.innerHTML = `
+                [
+                    attendance.attendanceId ?? "N/A",
+                    studentName,
+                    subjectName,
+                    attendance.attendanceDate ?? "N/A",
+                    attendance.status ?? "N/A"
+                ].forEach(value => {
+                    const cell = document.createElement("td");
+                    cell.textContent = String(value);
+                    row.appendChild(cell);
+                });
 
-                    <td>
-                        ${attendance.attendanceId ?? "N/A"}
-                    </td>
+                const actions = document.createElement("td");
+                const editButton = document.createElement("button");
+                editButton.className = "edit-button";
+                editButton.textContent = "Edit";
+                editButton.addEventListener("click", () => {
+                    editAttendance(attendance.attendanceId);
+                });
+                actions.appendChild(editButton);
 
-                    <td>
-                        ${studentName}
-                    </td>
-
-                    <td>
-                        ${subjectName}
-                    </td>
-
-                    <td>
-                        ${attendance.attendanceDate ?? "N/A"}
-                    </td>
-
-                    <td>
-                        ${attendance.status ?? "N/A"}
-                    </td>
-
-                    <td>
-
-                        <button
-                            class="edit-button"
-                            onclick="editAttendance(
-                                ${attendance.attendanceId}
-                            )">
-
-                            Edit
-
-                        </button>
-
-
-                        <button
-                            class="delete-button"
-                            onclick="deleteAttendance(
-                                ${attendance.attendanceId}
-                            )">
-
-                            Delete
-
-                        </button>
-
-                    </td>
-
-                `;
+                const deleteButton = document.createElement("button");
+                deleteButton.className = "delete-button";
+                deleteButton.textContent = "Delete";
+                deleteButton.addEventListener("click", () => {
+                    deleteAttendance(attendance.attendanceId);
+                });
+                actions.appendChild(deleteButton);
+                row.appendChild(actions);
 
 
                 tbody.appendChild(row);

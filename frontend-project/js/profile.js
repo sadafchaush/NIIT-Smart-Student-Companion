@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:8080";
+const API_BASE_URL = window.NIIT_API_BASE_URL;
 
 console.log("profile.js loaded successfully");
 

@@ -19,12 +19,15 @@ public class DirectMessageService {
 
     private final DirectMessageRepository messageRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     public DirectMessageService(
             DirectMessageRepository messageRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            NotificationService notificationService) {
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     @Transactional(readOnly = true)
@@ -88,7 +91,16 @@ public class DirectMessageService {
         message.setSender(sender);
         message.setRecipient(recipient);
         message.setContent(trimmedContent);
-        return toResponse(messageRepository.save(message));
+        DirectMessage savedMessage = messageRepository.save(message);
+        if ("FACULTY".equals(sender.getRole())
+                && "STUDENT".equals(recipient.getRole())) {
+            notificationService.notifyFacultyMessage(
+                    recipient.getEmail(), sender.getName(), trimmedContent);
+        } else {
+            notificationService.notifyStudentMessage(
+                    recipient.getEmail(), sender.getName(), trimmedContent);
+        }
+        return toResponse(savedMessage);
     }
 
     private User getCampusUser(Long userId) {

@@ -1,5 +1,5 @@
 
-const API_BASE_URL = "http://localhost:8080";
+const API_BASE_URL = window.NIIT_API_BASE_URL;
 
 let assignments = [];
 let submissions = [];
@@ -108,23 +108,6 @@ function getSubjectName(subjectId) {
 }
 
 // ========================================
-// SAFE HTML TEXT
-// ========================================
-
-function escapeHtml(value) {
-    if (value === null || value === undefined) {
-        return "";
-    }
-
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-// ========================================
 // LOAD ASSIGNMENTS
 // ========================================
 
@@ -197,7 +180,7 @@ function displayAssignments() {
         return;
     }
 
-    container.innerHTML = "";
+    container.replaceChildren();
 
     assignments.forEach(function (assignment) {
         const submission = submissions.find(function (sub) {
@@ -216,53 +199,47 @@ function displayAssignments() {
         const card = document.createElement("div");
         card.className = "assignment-card";
 
-        card.innerHTML = `
-            <h2>${escapeHtml(title)}</h2>
+        const heading = document.createElement("h2");
+        heading.textContent = title;
+        card.appendChild(heading);
 
-            <p>${escapeHtml(description)}</p>
+        const descriptionElement = document.createElement("p");
+        descriptionElement.textContent = description;
+        card.appendChild(descriptionElement);
 
-            <p>
-                <strong>Class / Year:</strong>
-                ${escapeHtml(className)}
-            </p>
+        [
+            ["Class / Year:", className],
+            ["Semester:", semester || "Not specified"],
+            ["Subject:", subjectName],
+            ["Deadline:", dueDate]
+        ].forEach(([label, value]) => {
+            const paragraph = document.createElement("p");
+            if (label === "Deadline:") {
+                paragraph.className = "due-date";
+            }
+            const strong = document.createElement("strong");
+            strong.textContent = label + " ";
+            paragraph.appendChild(strong);
+            paragraph.appendChild(
+                document.createTextNode(value == null ? "" : String(value))
+            );
+            card.appendChild(paragraph);
+        });
 
-            <p>
-                <strong>Semester:</strong>
-                ${semester
-                    ? escapeHtml(semester)
-                    : "Not specified"}
-            </p>
+        const status = document.createElement("div");
+        status.className = `status ${isSubmitted ? "submitted" : "pending"}`;
+        status.textContent =
+            `Status: ${isSubmitted ? "Submitted" : "Not Submitted"}`;
+        card.appendChild(status);
 
-            <p>
-                <strong>Subject:</strong>
-                ${escapeHtml(subjectName)}
-            </p>
-
-            <p class="due-date">
-                <strong>Deadline:</strong>
-                ${escapeHtml(dueDate)}
-            </p>
-
-            <div class="
-                status
-                ${isSubmitted ? "submitted" : "pending"}
-            ">
-                Status:
-                ${isSubmitted ? "Submitted" : "Not Submitted"}
-            </div>
-
-            <button
-                type="button"
-                class="submit-work-btn"
-                ${isSubmitted ? "disabled" : ""}
-            >
-                ${isSubmitted
-                    ? "Already Submitted"
-                    : "Submit Assignment"}
-            </button>
-        `;
-
-        const button = card.querySelector(".submit-work-btn");
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "submit-work-btn";
+        button.disabled = isSubmitted;
+        button.textContent = isSubmitted
+            ? "Already Submitted"
+            : "Submit Assignment";
+        card.appendChild(button);
 
         if (!isSubmitted) {
             button.addEventListener("click", function () {

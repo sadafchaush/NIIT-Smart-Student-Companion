@@ -1,5 +1,4 @@
-const API_BASE_URL =
-    "http://localhost:8080";
+const API_BASE_URL = window.NIIT_API_BASE_URL;
 
 
 console.log(
@@ -304,52 +303,29 @@ async function loadSubmissions() {
                     );
 
 
-                row.innerHTML = `
+                [studentName, assignmentTitle].forEach(value => {
+                    const cell = document.createElement("td");
+                    cell.textContent = value == null ? "" : String(value);
+                    row.appendChild(cell);
+                });
 
-                    <td>
-                        ${escapeHTML(
-                            studentName
-                        )}
-                    </td>
+                const fileCell = document.createElement("td");
+                if (fileUrl) {
+                    const link = document.createElement("a");
+                    link.href = fileUrl;
+                    link.target = "_blank";
+                    link.rel = "noopener noreferrer";
+                    link.className = "file-button";
+                    link.textContent = "View File";
+                    fileCell.appendChild(link);
+                } else {
+                    fileCell.textContent = "No File";
+                }
+                row.appendChild(fileCell);
 
-
-                    <td>
-                        ${escapeHTML(
-                            assignmentTitle
-                        )}
-                    </td>
-
-
-                    <td>
-
-                        ${
-                            fileUrl
-                                ? `
-                                    <a
-                                        href="${escapeAttribute(
-                                            fileUrl
-                                        )}"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        class="file-button">
-
-                                        View File
-
-                                    </a>
-                                  `
-                                : "No File"
-                        }
-
-                    </td>
-
-
-                    <td>
-                        ${escapeHTML(
-                            submittedDate
-                        )}
-                    </td>
-
-                `;
+                const dateCell = document.createElement("td");
+                dateCell.textContent = submittedDate;
+                row.appendChild(dateCell);
 
 
                 tableBody.appendChild(
@@ -370,32 +346,14 @@ async function loadSubmissions() {
         );
 
 
-        tableBody.innerHTML = `
-
-            <tr>
-
-                <td
-                    colspan="4"
-                    class="error">
-
-                    Unable to load student submissions.
-
-                    <br><br>
-
-                    ${escapeHTML(
-                        error.message
-                    )}
-
-                    <br><br>
-
-                    Please make sure Spring Boot
-                    is running.
-
-                </td>
-
-            </tr>
-
-        `;
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 4;
+        cell.className = "error";
+        cell.textContent =
+            `Unable to load student submissions. ${error.message} Please make sure Spring Boot is running.`;
+        row.replaceChildren(cell);
+        tableBody.replaceChildren(row);
 
     }
 
@@ -420,72 +378,6 @@ function safeHttpUrl(value) {
         return null;
     }
 }
-
-function escapeHTML(value) {
-
-    if (
-        value === null ||
-        value === undefined
-    ) {
-
-        return "";
-
-    }
-
-
-    return String(value)
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
-}
-
-
-// ======================================================
-// ESCAPE URL ATTRIBUTE
-// ======================================================
-
-function escapeAttribute(value) {
-
-    if (
-        value === null ||
-        value === undefined
-    ) {
-
-        return "";
-
-    }
-
-
-    return String(value)
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
-}
-
 
 // ======================================================
 // BACK TO FACULTY DASHBOARD

@@ -1,5 +1,5 @@
 const MESSAGES_API =
-    `http://${window.location.hostname}:8080/messages`;
+    `${window.NIIT_API_BASE_URL}/messages`;
 
 document.addEventListener("DOMContentLoaded", () => {
     const user = getLoggedInUser();

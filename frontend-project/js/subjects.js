@@ -1,8 +1,7 @@
 console.log("subjects.js loaded successfully");
 
 
-const SUBJECTS_API =
-    "http://localhost:8080/subjects";
+const SUBJECTS_API = `${window.NIIT_API_BASE_URL}/subjects`;
 
 
 document.addEventListener(
@@ -12,7 +11,7 @@ document.addEventListener(
         console.log("Subjects page loaded");
 
         loadSubjects();
-
+loadFacultyOptions();
 
         const subjectForm =
             document.getElementById(
@@ -114,7 +113,7 @@ async function loadSubjects() {
         }
 
 
-        tableBody.innerHTML = "";
+        tableBody.replaceChildren();
 
 
         subjects.forEach(
@@ -140,29 +139,17 @@ async function loadSubjects() {
                 }
 
 
-                row.innerHTML = `
-
-                    <td>
-                        ${subject.subjectId ?? "-"}
-                    </td>
-
-                    <td>
-                        ${subject.subjectName ?? "-"}
-                    </td>
-
-                    <td>
-                        ${subject.subjectCode ?? "-"}
-                    </td>
-
-                    <td>
-                        ${subject.semester ?? "-"}
-                    </td>
-
-                    <td>
-                        ${facultyId}
-                    </td>
-
-                `;
+                [
+                    subject.subjectId ?? "-",
+                    subject.subjectName ?? "-",
+                    subject.subjectCode ?? "-",
+                    subject.semester ?? "-",
+                    facultyId
+                ].forEach(value => {
+                    const cell = document.createElement("td");
+                    cell.textContent = String(value);
+                    row.appendChild(cell);
+                });
 
 
                 tableBody.appendChild(
@@ -195,6 +182,61 @@ async function loadSubjects() {
 }
 
 
+
+async function loadFacultyOptions() {
+
+    const facultySelect = document.getElementById("facultyId");
+
+    if (!facultySelect) return;
+
+    facultySelect.innerHTML =
+        '<option value="">Loading faculty...</option>';
+
+    try {
+
+const response = await fetch(
+    `${window.NIIT_API_BASE_URL}/faculty`,
+    {
+        credentials: "include"
+    }
+);
+
+        if (!response.ok) {
+            throw new Error("Unable to load faculty.");
+        }
+
+        const facultyList = await response.json();
+
+        facultySelect.innerHTML =
+            '<option value="">Select Faculty</option>';
+
+        if (!facultyList || facultyList.length === 0) {
+            facultySelect.innerHTML =
+                '<option value="">No faculty available</option>';
+            return;
+        }
+
+        facultyList.forEach(faculty => {
+
+            const option = document.createElement("option");
+
+            option.value = faculty.facultyId;
+
+            option.textContent =
+                `${faculty.fullName} (ID: ${faculty.facultyId})`;
+
+            facultySelect.appendChild(option);
+        });
+
+    } catch (error) {
+        console.error("Faculty loading error:", error);
+
+        facultySelect.innerHTML =
+            '<option value="">Unable to load faculty</option>';
+    }
+}
+
+
 // =====================================================
 // ADD SUBJECT
 // =====================================================
@@ -204,7 +246,7 @@ async function saveSubject(event) {
     event.preventDefault();
 
 
-    const subjectName =
+    const subjectName = 
         document
             .getElementById(
                 "subjectName"

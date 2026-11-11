@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.niit.studentcompanion.entity.Attendance;
 import com.niit.studentcompanion.entity.Student;
@@ -29,8 +30,11 @@ public class AttendanceService {
     @Autowired
     private com.niit.studentcompanion.repository.FacultyRepository facultyRepository;
 
+    @Autowired
+    private NotificationService notificationService;
 
     // Add Attendance
+    @Transactional
     public Attendance addAttendance(Attendance attendance) {
 
         // Find Student
@@ -87,7 +91,9 @@ public class AttendanceService {
                     org.springframework.http.HttpStatus.CONFLICT,
                     "Attendance is already recorded for this student, subject, and date");
         }
-        return attendanceRepository.save(attendance);
+        Attendance savedAttendance = attendanceRepository.save(attendance);
+        notificationService.notifyAttendance(savedAttendance);
+        return savedAttendance;
     }
 
 
@@ -132,6 +138,7 @@ public class AttendanceService {
 
 
     // Update Attendance
+    @Transactional
     public Attendance updateAttendance(
             Integer id,
             Attendance attendanceDetails) {
@@ -218,7 +225,9 @@ public class AttendanceService {
                     "Attendance is already recorded for this student, subject, and date");
         }
 
-        return attendanceRepository.save(attendance);
+        Attendance savedAttendance = attendanceRepository.save(attendance);
+        notificationService.notifyAttendance(savedAttendance);
+        return savedAttendance;
     }
 
     private void validateStudentSemester(Attendance attendance) {

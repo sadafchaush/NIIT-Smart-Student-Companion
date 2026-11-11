@@ -26,6 +26,7 @@ public class NoteService {
 
     private final NoteRepository noteRepository;
     private final SubjectRepository subjectRepository;
+    private final NotificationService notificationService;
 
     private static final long MAX_FILE_SIZE = 10L * 1024 * 1024;
     private final Path uploadFolder = Paths.get("uploads", "notes")
@@ -33,13 +34,18 @@ public class NoteService {
 
     public NoteService(
             NoteRepository noteRepository,
-            SubjectRepository subjectRepository) {
+            SubjectRepository subjectRepository,
+            NotificationService notificationService) {
         this.noteRepository = noteRepository;
         this.subjectRepository = subjectRepository;
+        this.notificationService = notificationService;
 
     }
 
-    private void validateNoteAccess(Long subjectId, Long facultyId, Integer semester) {
+    private Integer validateNoteAccess(
+            Long subjectId,
+            Long facultyId,
+            Integer semester) {
         if (subjectId == null) {
             throw new IllegalArgumentException("Subject is required.");
         }
@@ -71,13 +77,18 @@ public class NoteService {
             throw new IllegalArgumentException(
                     "Note semester does not match the subject semester.");
         }
+        return semester;
     }
 
+    @Transactional
     public Note createNote(Note note) {
-        validateNoteAccess(note.getSubjectId(), note.getFacultyId(), note.getSemester());
+        note.setSemester(validateNoteAccess(
+                note.getSubjectId(), note.getFacultyId(), note.getSemester()));
         note.setFileName(null);
         note.setFileUrl(null);
-        return noteRepository.save(note);
+        Note savedNote = noteRepository.save(note);
+        notificationService.notifyNote(savedNote);
+        return savedNote;
     }
 
     public List<Note> getAllNotes() {
@@ -123,7 +134,10 @@ public class NoteService {
                 .orElseThrow(() -> new RuntimeException(
                         "Note not found with id: " + id));
 
-        validateNoteAccess(updatedNote.getSubjectId(), updatedNote.getFacultyId(), updatedNote.getSemester());
+        updatedNote.setSemester(validateNoteAccess(
+                updatedNote.getSubjectId(),
+                updatedNote.getFacultyId(),
+                updatedNote.getSemester()));
 
         existingNote.setTitle(updatedNote.getTitle());
         existingNote.setDescription(updatedNote.getDescription());
@@ -146,7 +160,7 @@ public class NoteService {
             Integer semester) {
 
         String extension = validateFile(file);
-        validateNoteAccess(subjectId, facultyId, semester);
+        semester = validateNoteAccess(subjectId, facultyId, semester);
 
         String newFileName = UUID.randomUUID() + extension;
         Path filePath = uploadFolder.resolve(newFileName).normalize();
@@ -185,7 +199,9 @@ public class NoteService {
                     + savedNote.getId()
                     + "/download");
 
-            return noteRepository.save(savedNote);
+            Note uploadedNote = noteRepository.save(savedNote);
+            notificationService.notifyNote(uploadedNote);
+            return uploadedNote;
 
         } catch (IOException e) {
             throw new ResponseStatusException(

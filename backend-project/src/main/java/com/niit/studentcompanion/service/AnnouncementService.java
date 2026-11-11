@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.niit.studentcompanion.entity.Announcement;
 import com.niit.studentcompanion.entity.Subject;
@@ -17,14 +18,17 @@ public class AnnouncementService {
     private final AnnouncementRepository announcementRepository;
     private final SubjectRepository subjectRepository;
     private final FacultyRepository facultyRepository;
+    private final NotificationService notificationService;
 
     public AnnouncementService(
             AnnouncementRepository announcementRepository,
             SubjectRepository subjectRepository,
-            FacultyRepository facultyRepository) {
+            FacultyRepository facultyRepository,
+            NotificationService notificationService) {
         this.announcementRepository = announcementRepository;
         this.subjectRepository = subjectRepository;
         this.facultyRepository = facultyRepository;
+        this.notificationService = notificationService;
     }
 
     private void validateAnnouncementAccess(Announcement announcement) {
@@ -63,9 +67,12 @@ public class AnnouncementService {
         }
     }
 
+    @Transactional
     public Announcement createAnnouncement(Announcement announcement) {
         validateAnnouncementAccess(announcement);
-        return announcementRepository.save(announcement);
+        Announcement savedAnnouncement = announcementRepository.save(announcement);
+        notificationService.notifyAnnouncement(savedAnnouncement);
+        return savedAnnouncement;
     }
 
     public List<Announcement> getAllAnnouncements() {

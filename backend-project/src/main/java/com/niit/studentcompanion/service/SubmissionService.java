@@ -23,16 +23,19 @@ public class SubmissionService {
     private final SubmissionRepository submissionRepository;
     private final AssignmentRepository assignmentRepository;
     private final StudentRepository studentRepository;
+    private final NotificationService notificationService;
 
     public SubmissionService(
             SubmissionRepository submissionRepository,
             AssignmentRepository assignmentRepository,
-            StudentRepository studentRepository) {
+            StudentRepository studentRepository,
+            NotificationService notificationService) {
 
         this.submissionRepository =
                 submissionRepository;
         this.assignmentRepository = assignmentRepository;
         this.studentRepository = studentRepository;
+        this.notificationService = notificationService;
     }
 
     // Get all submissions
@@ -110,9 +113,12 @@ public class SubmissionService {
                 LocalDateTime.now()
         );
 
-        return submissionRepository.save(
-                submission
-        );
+        Submission savedSubmission = submissionRepository.save(submission);
+        notificationService.notifyAssignmentSubmission(
+                assignment.getFacultyId(),
+                student.getName(),
+                assignment.getTitle());
+        return savedSubmission;
     }
 
     private static void validateFileUrl(String fileUrl) {

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.niit.studentcompanion.entity.Assignment;
 import com.niit.studentcompanion.entity.Subject;
@@ -15,12 +16,15 @@ public class AssignmentService {
 
     private final AssignmentRepository assignmentRepository;
     private final SubjectRepository subjectRepository;
+    private final NotificationService notificationService;
 
     public AssignmentService(
             AssignmentRepository assignmentRepository,
-            SubjectRepository subjectRepository) {
+            SubjectRepository subjectRepository,
+            NotificationService notificationService) {
         this.assignmentRepository = assignmentRepository;
         this.subjectRepository = subjectRepository;
+        this.notificationService = notificationService;
     }
 
     private void validateAssignmentAccess(Assignment assignment) {
@@ -59,9 +63,12 @@ public class AssignmentService {
         }
     }
 
+    @Transactional
     public Assignment createAssignment(Assignment assignment) {
         validateAssignmentAccess(assignment);
-        return assignmentRepository.save(assignment);
+        Assignment savedAssignment = assignmentRepository.save(assignment);
+        notificationService.notifyAssignment(savedAssignment);
+        return savedAssignment;
     }
 
     public List<Assignment> getAllAssignments() {

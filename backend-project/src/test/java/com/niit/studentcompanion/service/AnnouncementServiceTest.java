@@ -32,6 +32,9 @@ class AnnouncementServiceTest {
     @Mock
     private FacultyRepository facultyRepository;
 
+    @Mock
+    private NotificationService notificationService;
+
     @Test
     void rejectsAnnouncementFromFacultyNotAssignedToSubject() {
         Faculty assignedFaculty = new Faculty();
@@ -42,7 +45,8 @@ class AnnouncementServiceTest {
         subject.setFaculty(assignedFaculty);
         when(subjectRepository.findById(2)).thenReturn(Optional.of(subject));
         AnnouncementService service = new AnnouncementService(
-                announcementRepository, subjectRepository, facultyRepository);
+                announcementRepository, subjectRepository, facultyRepository,
+                notificationService);
         Announcement announcement = new Announcement();
         announcement.setSubjectId(2L);
         announcement.setFacultyId(8L);
@@ -61,7 +65,8 @@ class AnnouncementServiceTest {
         when(announcementRepository.findAll()).thenReturn(List.of(orphan));
         when(subjectRepository.findById(2)).thenReturn(Optional.empty());
         AnnouncementService service = new AnnouncementService(
-                announcementRepository, subjectRepository, facultyRepository);
+                announcementRepository, subjectRepository, facultyRepository,
+                notificationService);
 
         assertEquals(List.of(), service.getAllAnnouncements());
     }

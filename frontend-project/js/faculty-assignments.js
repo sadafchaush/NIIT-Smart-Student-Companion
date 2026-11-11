@@ -1,5 +1,5 @@
 
-const API_BASE_URL = "http://localhost:8080";
+const API_BASE_URL = window.NIIT_API_BASE_URL;
 
 let editingAssignmentId = null;
 
@@ -302,7 +302,7 @@ async function loadAssignments() {
             await response.json();
 
 
-        container.innerHTML = "";
+        container.replaceChildren();
 
 
         if (
@@ -338,57 +338,43 @@ async function loadAssignments() {
                     "assignment-card";
 
 
-                card.innerHTML = `
+                const title = document.createElement("h4");
+                title.textContent = assignment.title ?? "";
+                card.appendChild(title);
 
-                    <h4>
-                        ${assignment.title}
-                    </h4>
+                [
+                    ["Description:", assignment.description],
+                    ["Subject:", subjectName],
+                    ["Due Date:", assignment.dueDate],
+                    ["Assignment ID:", assignment.id]
+                ].forEach(([label, value]) => {
+                    const paragraph = document.createElement("p");
+                    const strong = document.createElement("strong");
+                    strong.textContent = `${label} `;
+                    paragraph.appendChild(strong);
+                    paragraph.appendChild(
+                        document.createTextNode(value == null ? "" : String(value))
+                    );
+                    card.appendChild(paragraph);
+                });
 
-                    <p>
-                        <strong>
-                            Description:
-                        </strong>
-                        ${assignment.description}
-                    </p>
+                const editButton = document.createElement("button");
+                editButton.type = "button";
+                editButton.className = "edit-button";
+                editButton.textContent = "Edit";
+                editButton.addEventListener("click", () => {
+                    editAssignment(assignment.id);
+                });
+                card.appendChild(editButton);
 
-                    <p>
-                        <strong>
-                            Subject:
-                        </strong>
-                        ${subjectName}
-                    </p>
-
-                    <p>
-                        <strong>
-                            Due Date:
-                        </strong>
-                        ${assignment.dueDate}
-                    </p>
-
-                    <p>
-                        <strong>
-                            Assignment ID:
-                        </strong>
-                        ${assignment.id}
-                    </p>
-
-                    <button
-                        class="edit-button"
-                        onclick="editAssignment(${assignment.id})">
-
-                        Edit
-
-                    </button>
-
-                    <button
-                        class="delete-button"
-                        onclick="deleteAssignment(${assignment.id})">
-
-                        Delete
-
-                    </button>
-
-                `;
+                const deleteButton = document.createElement("button");
+                deleteButton.type = "button";
+                deleteButton.className = "delete-button";
+                deleteButton.textContent = "Delete";
+                deleteButton.addEventListener("click", () => {
+                    deleteAssignment(assignment.id);
+                });
+                card.appendChild(deleteButton);
 
 
                 container.appendChild(card);
@@ -405,13 +391,11 @@ async function loadAssignments() {
         );
 
 
-        container.innerHTML = `
-            <div class="error">
-                Unable to load assignments.
-                <br><br>
-                ${error.message}
-            </div>
-        `;
+        const errorMessage = document.createElement("div");
+        errorMessage.className = "error";
+        errorMessage.textContent =
+            `Unable to load assignments. ${error.message}`;
+        container.replaceChildren(errorMessage);
     }
 }
 

@@ -1,7 +1,7 @@
 
 console.log("student-subjects.js loaded successfully");
 
-const API_URL = "http://localhost:8080/subjects";
+const API_URL = `${window.NIIT_API_BASE_URL}/subjects`;
 
 let allSubjects = [];
 

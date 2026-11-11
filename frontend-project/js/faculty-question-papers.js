@@ -47,7 +47,7 @@ if (!Number.isInteger(facultyId) || facultyId <= 0) {
         try {
 
             const response = await fetch(
-                "http://localhost:8080/subjects"
+                `${window.NIIT_API_BASE_URL}/subjects`
             );
 
             if (!response.ok) {
@@ -178,7 +178,7 @@ if (!Number.isInteger(facultyId) || facultyId <= 0) {
         try {
 
             const response = await fetch(
-                "http://localhost:8080/question-papers/upload",
+                `${window.NIIT_API_BASE_URL}/question-papers/upload`,
                 {
                     method: "POST",
                     body: formData

@@ -4,8 +4,7 @@
 
 console.log("faculty.js loaded successfully");
 
-const FACULTY_API_URL =
-    "http://localhost:8080/faculty";
+const FACULTY_API_URL = `${window.NIIT_API_BASE_URL}/faculty`;
 
 
 // ======================================================
@@ -148,48 +147,32 @@ function displayFaculty(facultyList) {
             const row =
                 document.createElement("tr");
 
-            row.innerHTML = `
+            [
+                id,
+                faculty.fullName,
+                faculty.email,
+                faculty.phone,
+                faculty.department,
+                faculty.designation
+            ].forEach(value => {
+                const cell = document.createElement("td");
+                cell.textContent = value == null ? "" : String(value);
+                row.appendChild(cell);
+            });
 
-                <td>${id}</td>
+            const actions = document.createElement("td");
+            const editButton = document.createElement("button");
+            editButton.type = "button";
+            editButton.textContent = "Edit";
+            editButton.addEventListener("click", () => editFaculty(id));
+            actions.appendChild(editButton);
 
-                <td>
-                    ${faculty.fullName ?? ""}
-                </td>
-
-                <td>
-                    ${faculty.email ?? ""}
-                </td>
-
-                <td>
-                    ${faculty.phone ?? ""}
-                </td>
-
-                <td>
-                    ${faculty.department ?? ""}
-                </td>
-
-                <td>
-                    ${faculty.designation ?? ""}
-                </td>
-
-                <td>
-
-                    <button
-                        type="button"
-                        onclick="editFaculty(${id})"
-                    >
-                        Edit
-                    </button>
-
-                    <button
-                        type="button"
-                        onclick="deleteFaculty(${id})"
-                    >
-                        Delete
-                    </button>
-
-                </td>
-            `;
+            const deleteButton = document.createElement("button");
+            deleteButton.type = "button";
+            deleteButton.textContent = "Delete";
+            deleteButton.addEventListener("click", () => deleteFaculty(id));
+            actions.appendChild(deleteButton);
+            row.appendChild(actions);
 
             tableBody.appendChild(row);
         }
@@ -241,6 +224,12 @@ async function saveFaculty() {
             ).value
     };
 
+    const passwordLength = Array.from(facultyData.password).length;
+    if ((!facultyId && passwordLength !== 6)
+            || (facultyId && facultyData.password && passwordLength !== 6)) {
+        alert("Password must be exactly 6 characters.");
+        return;
+    }
 
     try {
 
@@ -387,6 +376,13 @@ async function editFaculty(id) {
             "password"
         ).value = "";
 
+        document.getElementById(
+            "password"
+        ).required = false;
+        document.getElementById(
+            "password"
+        ).placeholder = "Leave blank to keep the current password";
+
 
         document.getElementById(
             "submitButton"
@@ -504,6 +500,13 @@ function resetForm() {
         "submitButton"
     ).textContent =
         "Add Faculty";
+
+    document.getElementById(
+        "password"
+    ).required = true;
+    document.getElementById(
+        "password"
+    ).placeholder = "Exactly 6 characters";
 
 
     document.getElementById(

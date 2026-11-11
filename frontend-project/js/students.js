@@ -2,7 +2,7 @@
 // ADMIN STUDENT MANAGEMENT - students.js
 // ======================================================
 
-const API_BASE_URL = "http://localhost:8080/students";
+const API_BASE_URL = `${window.NIIT_API_BASE_URL}/students`;
 
 console.log("students.js loaded successfully");
 
@@ -83,6 +83,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     getStudents();
+    getPendingStudents();
 
 
     const studentForm =
@@ -165,6 +166,12 @@ async function saveStudent() {
         passwordElement.value :
         "";
 
+    const passwordLength = Array.from(password).length;
+    if ((!studentId && passwordLength !== 6)
+            || (studentId && password && passwordLength !== 6)) {
+        alert("Password must be exactly 6 characters.");
+        return;
+    }
 
     if (!name || !email || !mobile || !course) {
 
@@ -197,10 +204,10 @@ async function saveStudent() {
 
         let response;
 
-
         // ==================================================
         // UPDATE STUDENT
         // ==================================================
+
 
         if (studentId) {
 
@@ -209,11 +216,12 @@ async function saveStudent() {
                 studentId
             );
 
-
             response = await fetch(
                 `${API_BASE_URL}/${studentId}`,
                 {
                     method: "PUT",
+
+                    credentials: "include",
 
                     headers: {
                         "Content-Type":
@@ -224,6 +232,9 @@ async function saveStudent() {
                         JSON.stringify(studentData)
                 }
             );
+
+        }
+
 
         }
 
@@ -390,7 +401,7 @@ async function getStudents() {
         );
 
 
-        tableBody.innerHTML = "";
+        tableBody.replaceChildren();
 
 
         if (
@@ -420,48 +431,37 @@ async function getStudents() {
             const row =
                 document.createElement("tr");
 
+            [
+                student.studentId,
+                student.name,
+                student.email,
+                student.mobile,
+                student.course
+            ].forEach(value => {
+                const cell = document.createElement("td");
+                cell.textContent = value == null ? "" : String(value);
+                row.appendChild(cell);
+            });
 
-            row.innerHTML = `
+            const actions = document.createElement("td");
+            const editButton = document.createElement("button");
+            editButton.type = "button";
+            editButton.className = "edit-btn";
+            editButton.textContent = "Edit";
+            editButton.addEventListener("click", () => {
+                editStudent(student.studentId);
+            });
+            actions.appendChild(editButton);
 
-                <td>
-                    ${student.studentId ?? ""}
-                </td>
-
-                <td>
-                    ${student.name ?? ""}
-                </td>
-
-                <td>
-                    ${student.email ?? ""}
-                </td>
-
-                <td>
-                    ${student.mobile ?? ""}
-                </td>
-
-                <td>
-                    ${student.course ?? ""}
-                </td>
-
-                <td>
-
-                    <button
-                        type="button"
-                        class="edit-btn"
-                        onclick="editStudent(${student.studentId})">
-                        Edit
-                    </button>
-
-                    <button
-                        type="button"
-                        class="delete-btn"
-                        onclick="deleteStudent(${student.studentId})">
-                        Delete
-                    </button>
-
-                </td>
-
-            `;
+            const deleteButton = document.createElement("button");
+            deleteButton.type = "button";
+            deleteButton.className = "delete-btn";
+            deleteButton.textContent = "Delete";
+            deleteButton.addEventListener("click", () => {
+                deleteStudent(student.studentId);
+            });
+            actions.appendChild(deleteButton);
+            row.appendChild(actions);
 
 
             tableBody.appendChild(row);
@@ -482,23 +482,123 @@ async function getStudents() {
         );
 
 
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="6"
-                    style="color:red;text-align:center;">
-
-                    Unable to load students.
-
-                    <br><br>
-
-                    ${error.message}
-
-                </td>
-            </tr>
-        `;
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 6;
+        cell.style.color = "red";
+        cell.style.textAlign = "center";
+        cell.textContent = `Unable to load students. ${error.message}`;
+        row.appendChild(cell);
+        tableBody.replaceChildren(row);
 
     }
 
+}
+
+async function getPendingStudents() {
+    if (!checkAdminAccess()) {
+        return;
+    }
+
+    const tableBody = document.getElementById("pendingStudentTableBody");
+    if (!tableBody) {
+        return;
+    }
+
+    tableBody.replaceChildren();
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/pending`);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const students = await response.json();
+        if (students.length === 0) {
+            const row = document.createElement("tr");
+            const cell = document.createElement("td");
+            cell.colSpan = 6;
+            cell.textContent = "No students are awaiting approval.";
+            row.appendChild(cell);
+            tableBody.appendChild(row);
+            return;
+        }
+
+        students.forEach(student => {
+            const row = document.createElement("tr");
+            [
+                student.studentId,
+                student.name,
+                student.email,
+                student.course
+            ].forEach(value => {
+                const cell = document.createElement("td");
+                cell.textContent = value == null ? "" : String(value);
+                row.appendChild(cell);
+            });
+
+            const semesterCell = document.createElement("td");
+            const semesterSelect = document.createElement("select");
+            semesterSelect.setAttribute(
+                "aria-label",
+                `Assign semester for ${student.name || "student"}`
+            );
+            for (let semester = 1; semester <= 6; semester += 1) {
+                const option = document.createElement("option");
+                option.value = String(semester);
+                option.textContent = `Semester ${semester}`;
+                semesterSelect.appendChild(option);
+            }
+            semesterCell.appendChild(semesterSelect);
+            row.appendChild(semesterCell);
+
+            const actionCell = document.createElement("td");
+            const approveButton = document.createElement("button");
+            approveButton.type = "button";
+            approveButton.className = "approve-btn";
+            approveButton.textContent = "Approve";
+            approveButton.addEventListener("click", () => {
+                approveStudent(student.studentId, semesterSelect.value);
+            });
+            actionCell.appendChild(approveButton);
+            row.appendChild(actionCell);
+            tableBody.appendChild(row);
+        });
+    } catch (error) {
+        console.error("Load pending students error:", error);
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 6;
+        cell.textContent = `Unable to load pending students: ${error.message}`;
+        row.appendChild(cell);
+        tableBody.appendChild(row);
+    }
+}
+
+async function approveStudent(studentId, semester) {
+    if (!checkAdminAccess()) {
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            `${API_BASE_URL}/${encodeURIComponent(studentId)}/approval`,
+            {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ semester: Number(semester) })
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        await Promise.all([getStudents(), getPendingStudents()]);
+    } catch (error) {
+        console.error("Approve student error:", error);
+        alert(`Unable to approve student:\n${error.message}`);
+    }
 }
 
 
@@ -577,6 +677,9 @@ async function editStudent(id) {
 
         if (passwordField) {
             passwordField.value = "";
+            passwordField.required = false;
+            passwordField.placeholder =
+                "Leave blank to keep the current password";
         }
 
 
@@ -726,6 +829,12 @@ function resetForm() {
         studentId.value = "";
     }
 
+    const passwordField =
+        document.getElementById("password");
+    if (passwordField) {
+        passwordField.required = true;
+        passwordField.placeholder = "Exactly 6 characters";
+    }
 
     const submitButton =
         document.getElementById(

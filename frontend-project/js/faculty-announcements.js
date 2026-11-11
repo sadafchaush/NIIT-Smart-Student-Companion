@@ -1,7 +1,7 @@
 
 console.log("faculty-announcements.js loaded successfully");
 
-const API_BASE_URL = "http://localhost:8080";
+const API_BASE_URL = window.NIIT_API_BASE_URL;
 
 async function getCurrentFaculty() {
     const userString = localStorage.getItem("loggedInUser");
@@ -73,15 +73,21 @@ async function loadAnnouncements() {
         return;
     }
 
-    container.innerHTML = "";
+    container.replaceChildren();
     visibleAnnouncements.forEach(function (item) {
         const card = document.createElement("div");
         card.className = "announcement-card";
-        card.innerHTML = `
-            <h4>${item.title || "Announcement"}</h4>
-            <p>${item.message || ""}</p>
-            <small>${item.announcementDate || ""}</small>
-        `;
+        const title = document.createElement("h4");
+        title.textContent = item.title || "Announcement";
+        card.appendChild(title);
+
+        const text = document.createElement("p");
+        text.textContent = item.message || "";
+        card.appendChild(text);
+
+        const date = document.createElement("small");
+        date.textContent = item.announcementDate || "";
+        card.appendChild(date);
         container.appendChild(card);
     });
 }

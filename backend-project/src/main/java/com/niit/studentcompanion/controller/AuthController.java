@@ -67,6 +67,19 @@ public class AuthController {
                 credentials.email(),
                 credentials.password(),
                 request.getRemoteAddr());
+
+                String actualRole = user.getRole().trim()
+        .toUpperCase(Locale.ROOT);
+
+String selectedRole = credentials.role() == null
+        ? ""
+        : credentials.role().trim().toUpperCase(Locale.ROOT);
+
+if (!actualRole.equals(selectedRole)) {
+    throw new ResponseStatusException(
+            HttpStatus.FORBIDDEN,
+            "Selected role does not match your account");
+}
         HttpSession previousSession = request.getSession(false);
         if (previousSession != null) {
             previousSession.invalidate();
@@ -113,9 +126,11 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
-    public record LoginRequest(String email, String password) {
-    }
-
+    public record LoginRequest(
+        String email,
+        String password,
+        String role) {
+}
     public record LoginResponse(
             String message,
             Long id,

@@ -1,5 +1,5 @@
-const NOTES_API = "http://localhost:8080/notes";
-const SUBJECTS_API = "http://localhost:8080/subjects";
+const NOTES_API = `${window.NIIT_API_BASE_URL}/notes`;
+const SUBJECTS_API = `${window.NIIT_API_BASE_URL}/subjects`;
 
 let subjectsList = [];
 let editingNoteId = null;
@@ -15,7 +15,7 @@ async function getLoggedInFacultyId() {
         const user = JSON.parse(loggedInUser);
         if (!user || !user.email) return null;
 
-        const response = await fetch("http://localhost:8080/faculty");
+        const response = await fetch(`${window.NIIT_API_BASE_URL}/faculty`);
         if (!response.ok) return null;
 
         const facultyList = await response.json();
@@ -147,39 +147,18 @@ function getSubjectName(subjectId) {
 // ======================================
 
 function getFileUrl(fileUrl) {
-    if (!fileUrl) {
+    if (typeof fileUrl !== "string" || !fileUrl.trim()) {
         return null;
     }
 
-    if (
-        fileUrl.startsWith("http://") ||
-        fileUrl.startsWith("https://")
-    ) {
-        return fileUrl;
+    try {
+        const url = new URL(fileUrl, NOTES_API);
+        return url.protocol === "http:" || url.protocol === "https:"
+            ? url.href
+            : null;
+    } catch {
+        return null;
     }
-
-    if (fileUrl.startsWith("/")) {
-        return "http://localhost:8080" + fileUrl;
-    }
-
-    return "http://localhost:8080/" + fileUrl;
-}
-
-// ======================================
-// ESCAPE HTML
-// ======================================
-
-function escapeHtml(value) {
-    if (value === null || value === undefined) {
-        return "";
-    }
-
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
 }
 
 // ======================================
@@ -223,93 +202,66 @@ async function loadNotes() {
             const subjectName = getSubjectName(note.subjectId);
             const fileUrl = getFileUrl(note.fileUrl);
 
-            let fileSection = "";
+            const heading = document.createElement("h4");
+            heading.textContent = note.title || "Untitled";
+            card.appendChild(heading);
+
+            [
+                ["Description:", note.description || "No description"],
+                ["Class:", note.className || "Not assigned"],
+                [
+                    "Semester:",
+                    note.semester ? `Semester ${note.semester}` : "Not assigned"
+                ],
+                ["Subject:", subjectName],
+                ["Faculty ID:", note.facultyId || "Not assigned"]
+            ].forEach(([label, value]) => {
+                const paragraph = document.createElement("p");
+                const strong = document.createElement("strong");
+                strong.textContent = `${label} `;
+                paragraph.appendChild(strong);
+                paragraph.appendChild(
+                    document.createTextNode(value == null ? "" : String(value))
+                );
+                card.appendChild(paragraph);
+            });
 
             if (fileUrl) {
-                fileSection = `
-                    <p>
-                        <a
-                            href="${fileUrl}"
-                            target="_blank"
-                            rel="noopener noreferrer">
-                            📥 Open / Download File
-                        </a>
-                    </p>
-                `;
+                const fileParagraph = document.createElement("p");
+                const link = document.createElement("a");
+                link.href = fileUrl;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                link.textContent = "📥 Open / Download File";
+                fileParagraph.appendChild(link);
+                card.appendChild(fileParagraph);
             } else {
-                fileSection = `<p>No file available</p>`;
+                const noFile = document.createElement("p");
+                noFile.textContent = "No file available";
+                card.appendChild(noFile);
             }
 
-            card.innerHTML = `
-                <h4>
-                    ${escapeHtml(note.title || "Untitled")}
-                </h4>
+            const actions = document.createElement("div");
+            actions.style.marginTop = "15px";
+            actions.style.display = "flex";
+            actions.style.gap = "10px";
 
-                <p>
-                    <strong>Description:</strong>
-                    ${escapeHtml(note.description || "No description")}
-                </p>
+            const editButton = document.createElement("button");
+            editButton.type = "button";
+            editButton.style.cssText =
+                "background:#2563eb;color:white;border:none;padding:8px 15px;border-radius:5px;cursor:pointer;";
+            editButton.textContent = "✏️ Edit";
+            editButton.addEventListener("click", () => editNote(note.id));
+            actions.appendChild(editButton);
 
-                <p>
-                    <strong>Class:</strong>
-                    ${escapeHtml(note.className || "Not assigned")}
-                </p>
-
-                <p>
-                    <strong>Semester:</strong>
-                    ${
-                        note.semester
-                            ? "Semester " + escapeHtml(note.semester)
-                            : "Not assigned"
-                    }
-                </p>
-
-                <p>
-                    <strong>Subject:</strong>
-                    ${escapeHtml(subjectName)}
-                </p>
-
-                <p>
-                    <strong>Faculty ID:</strong>
-                    ${escapeHtml(note.facultyId || "Not assigned")}
-                </p>
-
-                ${fileSection}
-
-                <div style="
-                    margin-top: 15px;
-                    display: flex;
-                    gap: 10px;
-                ">
-                    <button
-                        type="button"
-                        onclick="editNote(${note.id})"
-                        style="
-                            background: #2563eb;
-                            color: white;
-                            border: none;
-                            padding: 8px 15px;
-                            border-radius: 5px;
-                            cursor: pointer;
-                        ">
-                        ✏️ Edit
-                    </button>
-
-                    <button
-                        type="button"
-                        onclick="deleteNote(${note.id})"
-                        style="
-                            background: #dc2626;
-                            color: white;
-                            border: none;
-                            padding: 8px 15px;
-                            border-radius: 5px;
-                            cursor: pointer;
-                        ">
-                        🗑️ Delete
-                    </button>
-                </div>
-            `;
+            const deleteButton = document.createElement("button");
+            deleteButton.type = "button";
+            deleteButton.style.cssText =
+                "background:#dc2626;color:white;border:none;padding:8px 15px;border-radius:5px;cursor:pointer;";
+            deleteButton.textContent = "🗑️ Delete";
+            deleteButton.addEventListener("click", () => deleteNote(note.id));
+            actions.appendChild(deleteButton);
+            card.appendChild(actions);
 
             container.appendChild(card);
         });

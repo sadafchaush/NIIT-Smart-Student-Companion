@@ -1,3 +1,4 @@
+
 package com.niit.studentcompanion.dto;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ public record FacultyResponse(
                 faculty.getPhone(),
                 faculty.getDepartment(),
                 faculty.getDesignation(),
-                faculty.getCreatedAt());
+                faculty.getCreatedAt()
+        );
     }
 }

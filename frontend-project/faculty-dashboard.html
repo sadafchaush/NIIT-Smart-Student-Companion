@@ -85,6 +85,12 @@
             background: #b91c1c;
         }
 
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
         /* =========================
            MAIN CONTAINER
         ========================= */
@@ -291,6 +297,8 @@
         }
 
     </style>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/notifications.css">
 
 </head>
 
@@ -313,16 +321,38 @@
         </h1>
 
 
-        <button
-            type="button"
-            class="logout"
-            onclick="logout()">
+        <div class="header-actions">
+            <div class="notification-wrap">
+                <button
+                    class="notification-toggle"
+                    id="notificationToggle"
+                    type="button"
+                    aria-label="Notifications"
+                    aria-expanded="false"
+                    aria-controls="notificationDropdown">
+                    <i class="fa-solid fa-bell" aria-hidden="true"></i>
+                    <span class="notification-count" id="notificationCount" hidden></span>
+                </button>
+                <section
+                    class="notification-dropdown"
+                    id="notificationDropdown"
+                    aria-label="Notifications"
+                    hidden>
+                    <div class="notification-heading">
+                        <h2>Notifications</h2>
+                    </div>
+                    <ul class="notification-list" id="notificationList"></ul>
+                </section>
+            </div>
 
-            <i class="fa-solid fa-right-from-bracket"></i>
-
-            Logout
-
-        </button>
+            <button
+                type="button"
+                class="logout"
+                onclick="logout()">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                Logout
+            </button>
+        </div>
 
     </div>
 
@@ -370,6 +400,7 @@
             <!-- NOTES -->
 
             <div class="card">
+                <span class="module-status status-updated">Updated</span>
 
                 <div>
 
@@ -554,6 +585,7 @@
             <!-- MESSAGES -->
 
             <div class="card">
+                <span class="module-status status-new">New</span>
 
                 <div>
 
@@ -668,6 +700,7 @@
 
 <script src="js/api.js"></script>
 <script src="js/auth.js"></script>
+<script src="js/notifications.js"></script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {

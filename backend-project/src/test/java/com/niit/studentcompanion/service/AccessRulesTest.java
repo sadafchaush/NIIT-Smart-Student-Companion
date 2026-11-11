@@ -28,6 +28,9 @@ class AccessRulesTest {
     @Mock
     private SubjectRepository subjectRepository;
 
+    @Mock
+    private NotificationService notificationService;
+
     @Test
     void studentShouldTrackSemester() {
         Student student = new Student();
@@ -49,7 +52,8 @@ class AccessRulesTest {
         when(subjectRepository.findById(10)).thenReturn(Optional.of(subject));
 
         AssignmentService assignmentService =
-                new AssignmentService(assignmentRepository, subjectRepository);
+                new AssignmentService(
+                        assignmentRepository, subjectRepository, notificationService);
 
         Assignment assignment = new Assignment(
                 "Semester 1 Assignment",

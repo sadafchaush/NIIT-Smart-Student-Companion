@@ -3,7 +3,7 @@
 // NOTES.JS - STUDENT STUDY NOTES
 // =====================================================
 
-const API_BASE_URL = "http://localhost:8080";
+const API_BASE_URL = window.NIIT_API_BASE_URL;
 
 console.log("notes.js loaded successfully");
 
@@ -296,10 +296,10 @@ function displayNotes(notes) {
             // Uploaded files use the Spring Boot backend.
             // Do not use the Live Server URL (port 5500).
 
-            if (note.id != null) {
+            if (note.id != null && Number.isSafeInteger(Number(note.id))) {
 
                 downloadButton.href =
-                    `${API_BASE_URL}/notes/${note.id}/download`;
+                    `${API_BASE_URL}/notes/${encodeURIComponent(note.id)}/download`;
 
             } else {
 
@@ -309,13 +309,20 @@ function displayNotes(notes) {
                 const fileUrl =
                     note.fileUrl || note.filePath;
 
-                if (
-                    typeof fileUrl === "string" &&
-                    /^https?:\/\//i.test(fileUrl)
-                ) {
+                let safeFileUrl = null;
+                if (typeof fileUrl === "string") {
+                    try {
+                        const parsedUrl = new URL(fileUrl);
+                        if (["http:", "https:"].includes(parsedUrl.protocol)) {
+                            safeFileUrl = parsedUrl.href;
+                        }
+                    } catch {
+                        safeFileUrl = null;
+                    }
+                }
 
-                    downloadButton.href = fileUrl;
-
+                if (safeFileUrl) {
+                    downloadButton.href = safeFileUrl;
                 } else {
 
                     downloadButton.href = "#";

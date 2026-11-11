@@ -267,7 +267,7 @@ async function logout() {
 
     try {
         const response = await fetch(
-            `http://${window.location.hostname}:8080/auth/logout`,
+            `${window.NIIT_API_BASE_URL}/auth/logout`,
             {
                 method: "POST",
                 credentials: "include"

@@ -28,6 +28,9 @@ class DirectMessageServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private NotificationService notificationService;
+
     @Test
     void sendsTrimmedMessageFromStudentToFaculty() {
         User student = user(1L, "Student", "STUDENT");
@@ -38,7 +41,8 @@ class DirectMessageServiceTest {
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         DirectMessageService service =
-                new DirectMessageService(messageRepository, userRepository);
+                new DirectMessageService(
+                        messageRepository, userRepository, notificationService);
         DirectMessageService.MessageResponse response =
                 service.sendMessage(1L, 2L, "  Hello faculty  ");
 
@@ -48,6 +52,27 @@ class DirectMessageServiceTest {
         verify(messageRepository).save(org.mockito.ArgumentMatchers.argThat(
                 message -> message.getSender().getId().equals(1L)
                         && message.getRecipient().getId().equals(2L)));
+        verify(notificationService).notifyStudentMessage(
+                "faculty@niit.edu", "Student", "Hello faculty");
+    }
+
+    @Test
+    void facultyMessageNotifiesTheStudentRecipient() {
+        User faculty = user(2L, "Faculty", "FACULTY");
+        User student = user(1L, "Student", "STUDENT");
+        when(userRepository.findById(2L)).thenReturn(Optional.of(faculty));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(student));
+        when(messageRepository.save(org.mockito.ArgumentMatchers.any()))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        DirectMessageService service =
+                new DirectMessageService(
+                        messageRepository, userRepository, notificationService);
+
+        service.sendMessage(2L, 1L, "  Hello student  ");
+
+        verify(notificationService).notifyFacultyMessage(
+                "student@niit.edu", "Faculty", "Hello student");
     }
 
     @Test
@@ -60,7 +85,8 @@ class DirectMessageServiceTest {
                 .thenReturn(Optional.of(secondStudent));
 
         DirectMessageService service =
-                new DirectMessageService(messageRepository, userRepository);
+                new DirectMessageService(
+                        messageRepository, userRepository, notificationService);
 
         assertThrows(
                 ResponseStatusException.class,
@@ -75,7 +101,8 @@ class DirectMessageServiceTest {
         when(userRepository.findById(2L)).thenReturn(Optional.of(faculty));
 
         DirectMessageService service =
-                new DirectMessageService(messageRepository, userRepository);
+                new DirectMessageService(
+                        messageRepository, userRepository, notificationService);
 
         assertThrows(
                 ResponseStatusException.class,
@@ -92,7 +119,8 @@ class DirectMessageServiceTest {
                 .thenReturn(Collections.emptyList());
 
         DirectMessageService service =
-                new DirectMessageService(messageRepository, userRepository);
+                new DirectMessageService(
+                        messageRepository, userRepository, notificationService);
 
         service.getConversation(1L, 2L);
 
@@ -109,7 +137,8 @@ class DirectMessageServiceTest {
         when(messageRepository.countUnreadForRecipient(1L)).thenReturn(3L);
 
         DirectMessageService service =
-                new DirectMessageService(messageRepository, userRepository);
+                new DirectMessageService(
+                        messageRepository, userRepository, notificationService);
 
         assertEquals(3L, service.getUnreadCount(1L));
     }

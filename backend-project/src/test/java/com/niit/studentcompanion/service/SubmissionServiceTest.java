@@ -33,6 +33,9 @@ class SubmissionServiceTest {
     @Mock
     private StudentRepository studentRepository;
 
+    @Mock
+    private NotificationService notificationService;
+
     @Test
     void rejectsSubmissionFromAnotherSemester() {
         Assignment assignment = new Assignment();
@@ -46,7 +49,8 @@ class SubmissionServiceTest {
         when(studentRepository.findById(20L))
                 .thenReturn(Optional.of(student));
         SubmissionService service = new SubmissionService(
-                submissionRepository, assignmentRepository, studentRepository);
+                submissionRepository, assignmentRepository, studentRepository,
+                notificationService);
         Submission submission = new Submission();
         submission.setAssignmentId(10L);
         submission.setStudentId(20L);
@@ -69,7 +73,8 @@ class SubmissionServiceTest {
         when(studentRepository.findById(20L))
                 .thenReturn(Optional.of(student));
         SubmissionService service = new SubmissionService(
-                submissionRepository, assignmentRepository, studentRepository);
+                submissionRepository, assignmentRepository, studentRepository,
+                notificationService);
         Submission submission = new Submission();
         submission.setAssignmentId(10L);
         submission.setStudentId(20L);

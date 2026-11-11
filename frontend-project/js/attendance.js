@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:8080";
+const API_BASE_URL = window.NIIT_API_BASE_URL;
 
 console.log("attendance.js loaded successfully");
 
@@ -100,7 +100,7 @@ async function loadAttendance() {
             attendanceList
         );
 
-        tableBody.innerHTML = "";
+        tableBody.replaceChildren();
 
         // No records
         if (
@@ -174,15 +174,13 @@ async function loadAttendance() {
                 const row =
                     document.createElement("tr");
 
-                row.innerHTML = `
-                    <td>
-                        ${subjectName}
-                    </td>
+                const subjectCell = document.createElement("td");
+                subjectCell.textContent = subjectName;
+                row.appendChild(subjectCell);
 
-                    <td>
-                        ${percentage.toFixed(0)}%
-                    </td>
-                `;
+                const percentageCell = document.createElement("td");
+                percentageCell.textContent = `${percentage.toFixed(0)}%`;
+                row.appendChild(percentageCell);
 
                 tableBody.appendChild(row);
 
@@ -196,15 +194,13 @@ async function loadAttendance() {
             error
         );
 
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="2" class="error">
-                    Unable to load attendance.
-                    <br><br>
-                    ${error.message}
-                </td>
-            </tr>
-        `;
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 2;
+        cell.className = "error";
+        cell.textContent = `Unable to load attendance. ${error.message}`;
+        row.appendChild(cell);
+        tableBody.replaceChildren(row);
     }
 }
 
